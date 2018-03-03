@@ -4,14 +4,52 @@ using UnityEngine;
 
 public class MainMenu : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-        Console.Log("MainMenu Start");
-        
+    public Animator mainCanvas, playCanvas, credits; //menük animator
+    private Stack<Animator> animatorStack = new Stack<Animator>();
+    /* Veremben tároljuk a navigációt, így egyszerűen vissza lehet jönni 
+     * PL: MainMenu -> Play -> Custom */
+    Animator GetCurrent() //jelenlegi menü lekérése
+    {
+        return animatorStack.Peek();
     }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    //jelenlegi menü kiszedése veremből
+    Animator GetCurrentPop()
+    {
+        return animatorStack.Pop();
+    }
+
+    // Use this for initialization
+    void Start () {
+        Console.Log("MainMenu Start");
+        animatorStack.Push(mainCanvas); //mainmenuvel kezdünk
+    }
+
+    public void Exit()
+    {
+        Application.Quit();
+    }
+
+    public void ChangeTo(Animator to)
+    {
+        //melyik menübe megyünk?
+        Console.Log("Change to: " + to.name);
+        GetCurrent().Play("out");
+        to.Play("in");
+        animatorStack.Push(to);
+    }
+
+    public void Back()
+    {
+        Console.Log("Back");
+        if (GetCurrent() == mainCanvas)
+        {
+            Application.Quit();
+        }
+        /* vissza gomb, ha mainmenüben vagyunk, akkor kilépés */
+        GetCurrentPop().Play("out");
+        GetCurrent().Play("in");
+        /* menü animációk
+         * ki -> ami menüből jövünk
+         * be -> amibe megyünk */
+    }
 }
