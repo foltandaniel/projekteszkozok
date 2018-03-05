@@ -26,7 +26,7 @@ public class MainMenu : MonoBehaviour {
 
     public void Exit()
     {
-        Application.Quit();
+        Dialog.Question("Exit game?", new UnityEngine.Events.UnityAction(delegate { Application.Quit(); }),new UnityEngine.Events.UnityAction(delegate { }));
     }
 
     public void ChangeTo(Animator to)
