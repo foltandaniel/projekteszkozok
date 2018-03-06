@@ -19,6 +19,10 @@ public class Console : MonoBehaviour {
     {
         singleton.MSG(msg);
     }
+    public static void LogError(string msg)
+    {
+        singleton.MSG( "<color=red>"+msg+"</color>");
+    }
     private void MSG(string msg)
     {
         Instantiate(consoleElementPrefab, parent).GetComponent<Text>().text = msg;
