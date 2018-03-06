@@ -52,4 +52,7 @@ public class MainMenu : MonoBehaviour {
          * ki -> ami menüből jövünk
          * be -> amibe megyünk */
     }
+
+
+
 }
