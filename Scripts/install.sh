@@ -10,4 +10,4 @@ curl -o Unity.pkg https://netstorage.unity3d.com/unity/fc1d3344e6ea/MacEditorIns
 curl -o WinSupport.pkg https://netstorage.unity3d.com/unity/fc1d3344e6ea/MacEditorTargetInstaller/UnitySetup-Windows-Support-for-Editor-2017.3.1f1.pkg
 echo 'Installing Unity.pkg'
 sudo installer -dumplog -package Unity.pkg -target /
-sudo installer WinSupport.pkg -target /
+sudo installer -dumplog -package WinSupport.pkg -target /
