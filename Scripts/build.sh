@@ -12,7 +12,7 @@ echo "Attempting to build $project for Windows"
   -silent-crashes \
   -logFile $(pwd)/unity.log \
   -projectPath $(pwd)/KiterjesztetAknakereso \
-  -executeMethod Auto.AutoBuild.PerformBuild \
+  -buildWindowsPlayer "$(pwd)/KiterjesztetAknakereso/Deploy/Win/$project.exe" \
   -quit
 
 #echo "Attempting to build $project for OS X"
