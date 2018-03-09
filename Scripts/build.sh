@@ -11,8 +11,8 @@ echo "Attempting to build $project for Windows"
   -nographics \
   -silent-crashes \
   -logFile $(pwd)/unity.log \
-  -projectPath $(pwd) \
-  -executeMethod AutoBuild.PerformBuild \
+  -projectPath $(pwd)/KiterjesztetAknakereso \
+  -executeMethod Auto.AutoBuild.PerformBuild \
   -quit
 
 #echo "Attempting to build $project for OS X"
