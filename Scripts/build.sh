@@ -11,7 +11,7 @@ echo "Attempting to build $project for Windows"
   -nographics \
   -silent-crashes \
   -logFile $(pwd)/unity.log \
-  -projectPath $(pwd)/KiterjesztetAknakereso \
+  -projectPath $(pwd)/KiterjesztetAknakeresoAsd \
   -buildWindowsPlayer "$(pwd)/KiterjesztetAknakereso/Deploy/Win/$project.exe" \
   -quit
 
