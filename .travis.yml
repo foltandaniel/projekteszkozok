@@ -5,7 +5,7 @@ language: objective-c
 cache:
   bundler: true
   directories:
-    - \Application\Unity\
+    - /Application/Unity/
 
 osx_image: xcode61
 rvm:
