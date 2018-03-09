@@ -2,6 +2,10 @@
 
 language: objective-c
 
+cache:
+  bundler: true
+  directories:
+    - \Application\Unity\
 
 osx_image: xcode61
 rvm:
@@ -12,8 +16,5 @@ before_install:
 install:
 - ./Scripts/install.sh
 
- cache:
-    directories:
-     - /Applications/Unity/Unity.app
 script:
 - ./Scripts/build.sh
