@@ -9,10 +9,9 @@ echo "Attempting to build $project for Windows"
 /Applications/Unity/Unity.app/Contents/MacOS/Unity \
   -batchmode \
   -nographics \
-  -silent-crashes \
+  -projectPath "$(pwd)/KiterjesztetAknakereso" \
+  -executeMethod Auto.AutoBuild.PerformBuild
   -logFile $(pwd)/unity.log \
-  -projectPath "$(pwd)/KiterjesztetAknakereso/" \
-  -buildWindowsPlayer "$(pwd)/KiterjesztetAknakereso/Deploy/Win/$project.exe" \
   -quit
 
 #echo "Attempting to build $project for OS X"
@@ -36,7 +35,7 @@ echo "Attempting to build $project for Windows"
 #  -quit
 
 echo 'Logs from build'
-cat $(pwd)/unity.
+cat $(pwd)/unity.log
 ls -all
 cd KiterjesztetAknakereso
 ls -all
