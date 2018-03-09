@@ -10,7 +10,7 @@ echo "Attempting to build $project for Windows"
   -batchmode \
   -nographics \
   -projectPath "$(pwd)/KiterjesztetAknakereso" \
-  -executeMethod Auto.AutoBuild.PerformBuild
+  -executeMethod Auto.AutoBuild.PerformBuild \
   -logFile $(pwd)/unity.log \
   -quit
 
