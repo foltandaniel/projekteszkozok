@@ -4,9 +4,9 @@
 
 # Change this the name of your project. This will be the name of the final executables as well.
 project="ci-build"
-
+cd KiterjesztetAknakereso;
 echo "Attempting to build $project for Windows"
-/Applications/Unity/Unity.app/Contents/MacOS/Unity -projectPath $(pwd)/KiterjesztetAknakereso -batchmode -nographics -executeMethod Auto.AutoBuild.PerformBuild -logFile $(pwd)/KiterjesztetAknakereso/unity.log -quit
+/Applications/Unity/Unity.app/Contents/MacOS/Unity -projectPath $(pwd) -batchmode -nographics -executeMethod Auto.AutoBuild.PerformBuild -logFile $(pwd)/unity.log -quit
 #echo "Attempting to build $project for OS X"
 #/Applications/Unity/Unity.app/Contents/MacOS/Unity \
 #  -batchmode \
@@ -28,7 +28,7 @@ echo "Attempting to build $project for Windows"
 #  -quit
 
 echo 'Logs from build'
-cat $(pwd)/KiterjesztetAknakereso/unity.log
+cat $(pwd)/unity.log
 ls -all
 cd KiterjesztetAknakereso
 ls -all
