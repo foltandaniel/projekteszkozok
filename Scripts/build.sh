@@ -6,14 +6,7 @@
 project="ci-build"
 
 echo "Attempting to build $project for Windows"
-/Applications/Unity/Unity.app/Contents/MacOS/Unity \
-  -batchmode \
-  -nographics \
-  -projectPath "$(pwd)/KiterjesztetAknakereso" \
-  -executeMethod Auto.AutoBuild.PerformBuild \
-  -logFile $(pwd)/unity.log \
-  -quit
-
+/Applications/Unity/Unity.app/Contents/MacOS/Unity -projectPath $(pwd)/KiterjesztetAknakereso -batchmode -nographics -executeMethod Auto.AutoBuild.PerformBuild -logFile $(pwd)/KiterjesztetAknakereso/unity.log -quit
 #echo "Attempting to build $project for OS X"
 #/Applications/Unity/Unity.app/Contents/MacOS/Unity \
 #  -batchmode \
@@ -35,7 +28,7 @@ echo "Attempting to build $project for Windows"
 #  -quit
 
 echo 'Logs from build'
-cat $(pwd)/unity.log
+cat $(pwd)/KiterjesztetAknakereso/unity.log
 ls -all
 cd KiterjesztetAknakereso
 ls -all
