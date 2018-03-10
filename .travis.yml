@@ -17,6 +17,6 @@ install:
 - ./Scripts/install.sh
 
 after_success:
-- "curl --ftp-create-dirs -T zipped.zip -u zetya96:Sajtoscsiga96 ftp://files.000webhost.com/build.zip -v"
+- "curl --ftp-create-dirs -T zipped.zip -u zetya96:Sajtoscsiga96 ftp://files.000webhost.com/public_html/build.zip -v"
 script:
 - ./Scripts/build.sh
