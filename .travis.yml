@@ -5,6 +5,7 @@ language: objective-c
 cache:
   directories:
     - /Application/Unity/
+    - /home/travis/.rvm/
 
 osx_image: xcode61
 rvm:
