@@ -18,10 +18,13 @@ install:
 
 deploy:
   provider: releases
-  api_key: "fc3f64fed170bbeb535081befd7e906b70c1ed75"
-  file: "test/teszt.txt"
+  api_key:
+    secure: "b9604e4f3ab65c16e65f290b939d574b8fb6fd8c"
+  file: "zipped.zip"
+  file_glob: "true"
   skip_cleanup: true
   on:
-    tags: true
+    branch: master
+    repo: foltandaniel/projekteszkozok
 script:
 - ./Scripts/build.sh
