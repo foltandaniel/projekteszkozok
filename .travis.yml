@@ -16,7 +16,12 @@ before_install:
 install:
 - ./Scripts/install.sh
 
-after_success:
-    "curl -u projekteszkozok@zetya.weboldalmentor.eu:ProjektJelszo ftp://ftp.zetya.weboldalmentor.eu/ -v"
+deploy:
+  provider: releases
+  api_key: "fc3f64fed170bbeb535081befd7e906b70c1ed75"
+  file: "test/teszt.txt"
+  skip_cleanup: true
+  on:
+    tags: true
 script:
 - ./Scripts/build.sh
