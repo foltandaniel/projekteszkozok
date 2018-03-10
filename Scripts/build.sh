@@ -30,8 +30,6 @@ echo "Attempting to build $project for Windows"
 echo 'Logs from build'
 cat $(pwd)/unity.log
 ls -all
-cd KiterjesztetAknakereso
-ls -all
 
 zip -r build.zip build
-ls
+ls -all
