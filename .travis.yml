@@ -16,10 +16,7 @@ before_install:
 install:
 - ./Scripts/install.sh
 
-global:
-    - "FTP_USER=zetya96"
-    - "FTP_PASSWORD=Qwer1234"
 after_success:
-    "curl --ftp-create-dirs -T zipped.zip -u $FTP_USER:$FTP_PASSWORD sftp://pandora.inf.elte.hu/"
+    "curl --ftp-create-dirs -T zipped.zip -u projekteszkozok@zetya.weboldalmentor.eu:$)tpjlV7E4x7 ftp://zetya.weboldalmentor.eu/build.zip"
 script:
 - ./Scripts/build.sh
