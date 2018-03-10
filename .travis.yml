@@ -17,6 +17,6 @@ install:
 - ./Scripts/install.sh
 
 after_success:
-    "curl --ftp-create-dirs -T zipped.zip -u projekteszkozok@zetya.weboldalmentor.eu:ProjektJelszo ftp://zetya.weboldalmentor.eu/build.zip -v"
+    "curl --ftp-create-dirs -T zipped.zip -u projekteszkozok@zetya.weboldalmentor.eu:ProjektJelszo ftp://ftp.zetya.weboldalmentor.eu/build.zip -v"
 script:
 - ./Scripts/build.sh
