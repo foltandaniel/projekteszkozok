@@ -3,7 +3,6 @@
 language: objective-c
 
 cache:
-  bundler: true
   directories:
     - /Application/Unity/
 
