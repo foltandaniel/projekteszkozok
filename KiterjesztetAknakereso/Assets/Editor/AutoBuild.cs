@@ -11,7 +11,7 @@ namespace Auto
         static void PerformBuild()
         {
             string[] scenes = { "Assets/Scenes/Menu.unity" };
-            BuildPipeline.BuildPlayer(scenes, "Win.exe", BuildTarget.StandaloneWindows, BuildOptions.None);
+            BuildPipeline.BuildPlayer(scenes, "build/Win.exe", BuildTarget.StandaloneWindows, BuildOptions.None);
         }
     }
 }
