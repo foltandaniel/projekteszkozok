@@ -6,6 +6,7 @@ public class ERROR_HANDLER : MonoBehaviour {
 
     void Awake()
     {
+       //Debug.Log("Error handler");
         Application.logMessageReceived += HandleException;
 
     }
