@@ -1,5 +1,7 @@
 #Projekteszközök beadandó
 
-Windows Buildet (.exe) a Deploy/Win mappában találod!
+Commit után Travis automatikusan buildel
+Build kihagyása: [ci skip] a commit üzenetbe
 
-#Commit teszt!
+Sikeres build után elérhető összecsomagolva:
+https://zetya96.000webhostapp.com/build.zip
