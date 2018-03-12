@@ -33,3 +33,5 @@ ls -all
 
 zip -r build.zip build
 ls -all
+
+echo 'Successful Build!!'
