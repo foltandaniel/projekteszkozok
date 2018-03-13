@@ -1,0 +1,12 @@
+C:\Users\gomis96\source\repos\WebProject\WebProject\bin\Debug\netcoreapp2.0\WebProject.deps.json
+C:\Users\gomis96\source\repos\WebProject\WebProject\bin\Debug\netcoreapp2.0\WebProject.runtimeconfig.json
+C:\Users\gomis96\source\repos\WebProject\WebProject\bin\Debug\netcoreapp2.0\WebProject.runtimeconfig.dev.json
+C:\Users\gomis96\source\repos\WebProject\WebProject\bin\Debug\netcoreapp2.0\WebProject.dll
+C:\Users\gomis96\source\repos\WebProject\WebProject\bin\Debug\netcoreapp2.0\WebProject.pdb
+C:\Users\gomis96\source\repos\WebProject\WebProject\obj\Debug\netcoreapp2.0\WebProject.csprojResolveAssemblyReference.cache
+C:\Users\gomis96\source\repos\WebProject\WebProject\obj\Debug\netcoreapp2.0\WebProject.csproj.CoreCompileInputs.cache
+C:\Users\gomis96\source\repos\WebProject\WebProject\obj\Debug\netcoreapp2.0\UserSecretsAssemblyInfo.cs
+C:\Users\gomis96\source\repos\WebProject\WebProject\obj\Debug\netcoreapp2.0\WebProject.AssemblyInfoInputs.cache
+C:\Users\gomis96\source\repos\WebProject\WebProject\obj\Debug\netcoreapp2.0\WebProject.AssemblyInfo.cs
+C:\Users\gomis96\source\repos\WebProject\WebProject\obj\Debug\netcoreapp2.0\WebProject.dll
+C:\Users\gomis96\source\repos\WebProject\WebProject\obj\Debug\netcoreapp2.0\WebProject.pdb
