@@ -54,5 +54,11 @@ public class MainMenu : MonoBehaviour {
     }
 
 
+    public void ShowLogin()
+    {
+        Login.Show();
+    }
+
+
 
 }

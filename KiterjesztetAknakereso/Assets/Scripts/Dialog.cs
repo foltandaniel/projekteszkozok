@@ -17,6 +17,8 @@ public class Dialog : MonoBehaviour {
 
     UnityAction closeDialog = new UnityAction(delegate {
         singleton.dialog.SetActive(false); //ablak bezárása minden gombnyomáskor
+        singleton.cancel.gameObject.SetActive(false);
+        singleton.yes.gameObject.SetActive(false);
     });
     void Awake()
     {
@@ -32,13 +34,16 @@ public class Dialog : MonoBehaviour {
         Console.Log("Showing dialog: " + question);
         singleton.question.text = question;
         singleton.AddEventsToButtons(yes, no);
+        singleton.yes.gameObject.SetActive(true);
+        singleton.cancel.gameObject.SetActive(true);
     }
     public static void Info(string info,UnityAction cancel)
     {
         singleton.dialog.SetActive(true);
-        Console.Log("Showing info" + info);
+        Console.Log("Showing info: " + info);
         singleton.question.text = info;
         singleton.AddEventsToButtons(null, cancel);
+        singleton.cancel.gameObject.SetActive(true);
     }
     private void AddEventsToButtons(UnityAction yes,UnityAction no)
     {

@@ -5,12 +5,11 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 public class Backend : MonoBehaviour {
     public static Backend singleton;
-    #region debug
-    public InputField dest;
-    public static string HOST_URL = "localhost";
+   
+    public static string HOST_URL = "localhost/";
     private static string SCOREBOARD_URL = HOST_URL + "scoreboard";
-    public GameObject hostDest;
-    #endregion
+
+
 
 
     [SerializeField]
@@ -19,23 +18,12 @@ public class Backend : MonoBehaviour {
     {
        singleton = this;    
     }
-    void Start()
-    {
-        dest.text = PlayerPrefs.GetString("HostDest", "localhost");
-    }
+   
     public static void ShowHideLoad(bool show)
     {
         singleton.waiting.SetActive(show);
     }
-    public void SetHostDestination()
-    {
-        Console.Log("DESTINATION SET TO " + dest.text);
-        PlayerPrefs.SetString("HostDest", dest.text);
-        PlayerPrefs.Save();
-        HOST_URL = dest.text;
-        Destroy(hostDest);
-    }
-
+   
     public IEnumerator GetScoreboard(UnityAction<string[]> toReturn)
        
         /* paraméterben kapunk egy függvényt, amit megehívunk, ha letöltődött a scoreboard

@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 
 
-public class MultiplayerUI : NetworkDiscovery {
+public class MultiplayerUI : MonoBehaviour {
 	[SerializeField]
 	public Text matchesFound;
 
@@ -19,55 +19,51 @@ public class MultiplayerUI : NetworkDiscovery {
 
 	private List<string> lobbys = new List<string>(); //tároljuk a szobákat
 	public void Init() {
-		Console.Log ("Started listening");
+
+		
+        GameDiscovery.singleton.StartListening();
 		lobbys.Clear ();
-		Initialize ();
-		StartAsClient ();
+        ClearList();
+		
 
-
-		/*OnReceivedBroadcast ("asd2", "asd");
-		OnReceivedBroadcast ("asd3", "asd");
-		OnReceivedBroadcast ("asd4", "asd");
-		OnReceivedBroadcast ("asd5", "asd");
-		OnReceivedBroadcast ("asd6", "asd");
-		OnReceivedBroadcast ("asd7", "asd");
-		OnReceivedBroadcast ("asd8", "asd");*/
 	}
-	public void StartListening() {
-		Console.Log ("Started broadcasting");
-		StopBroadcast ();
-		StartAsServer ();
+    private void ClearList()
+    {
+        matchesFound.text = "Matches found on your network: 0";
+        foreach(Transform go in contentParent)
+        {
+            Destroy(go.gameObject);
+        }
+    }
+	public void StartGame() {
+		
+        GameDiscovery.singleton.StartBroadcasting();
+       // GameNetworkManager.CreateGame();
+        Dialog.Info("Waiting for opponent..", new UnityEngine.Events.UnityAction(delegate
+         {
+             GameDiscovery.singleton.Stop();
+             Init();
+         }));
 	}
 	private void UpdateFoundMatchesText() {
-		matchesFound.text = "Matches found: " + lobbys.Count;
+		matchesFound.text = "Matches found on your network: " + lobbys.Count;
 	}
 
-	private void AddToScrollList(string fromAdress,string data) {
-		GameObject instantiated = Instantiate (joinButtonPrefab, contentParent);
+	public void AddToScrollList(string fromAddress,string data) {
+        if (lobbys.Contains(fromAddress)) //ha már tudunk a szobáról, figyelmen kvül hagyjuk
+            return;
+        lobbys.Add(fromAddress);
+        UpdateFoundMatchesText();
+        GameObject instantiated = Instantiate (joinButtonPrefab, contentParent);
 		//TODO - funkció hozzáadása a létrehozott gombhoz..
 
 		instantiated.GetComponentInChildren<Text> ().text = data;
 	}
-	public override void OnReceivedBroadcast(string fromAddress, string data)
-	{
-		
-		if (lobbys.Contains (fromAddress)) //ha már tudunk a szobáról, figyelmen kvül hagyjuk
-			return;
-		Console.Log ("Recieved broadcast from " + fromAddress);
-		//új szoba..
-		lobbys.Add (fromAddress);
-		UpdateFoundMatchesText ();
+	
 
-		AddToScrollList (fromAddress, data);
-
-	}
-	void Update() {
-		if (Input.GetKeyDown (KeyCode.Escape))
-			StopEverything ();
-	}
 	public void StopEverything() {
-		Console.Log ("Stopped network");
-		StopBroadcast ();
+		
+        GameDiscovery.singleton.Stop();
 	}
 
 	public void ShowList() {
