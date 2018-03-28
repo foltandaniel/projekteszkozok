@@ -12,8 +12,9 @@ public class Loader : MonoBehaviour {
          * Ezek nem "pusztulnak" el Scene váltáskor sem (amikor játékmódba váltunk) */
 		if(!alreadyLoaded)
         {
+            
             DontDestroyOnLoad(Instantiate(staticObjPrefab)); //Ne pusztuljon el scene váltáskor.
-
+            Console.Log("LOADER: LOADING STATIC OBJECTS");
             Destroy(this.gameObject); //Erre a Loaderre már nincs szükségünk
             alreadyLoaded = true;
         }
