@@ -30,7 +30,7 @@ public class Backend : MonoBehaviour {
          * ez azért kell, mert IEnumerator "aszinkron"-ban fut, ahol meghívjuk a függvény a következő sorban még NINCS meg
          * az eredmény */
     {
-        yield return new WaitForSeconds(3f);
+       
         Console.Log("Downloading scoreboard"); 
         WWW www = new WWW(SCOREBOARD_URL);
         yield return www;

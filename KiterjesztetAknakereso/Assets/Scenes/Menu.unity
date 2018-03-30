@@ -3022,7 +3022,8 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\xC1d\xE1m Viktor\nBellovics Tam\xE1s\nFolt\xE1n D\xE1niel\nZettisch D\xE1niel"
+  m_Text: "\xC1d\xE1m Viktor\nBellovics Tam\xE1s\nFolt\xE1n D\xE1niel\nZettisch D\xE1niel\n\n\nMusic:
+    TheFatRat"
 --- !u!222 &1036042594
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5268,7 +5269,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Content: {fileID: 1705571082}
-  m_Horizontal: 1
+  m_Horizontal: 0
   m_Vertical: 1
   m_MovementType: 1
   m_Elasticity: 0.1
