@@ -60,5 +60,8 @@ public class MainMenu : MonoBehaviour {
     }
 
 
-
+    public void StartRegular()
+    {
+        GameManager.StartRegular();
+    }
 }
