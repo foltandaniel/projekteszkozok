@@ -9,12 +9,12 @@ public enum GameMode
     CUSTOM,REGULAR
 }
 public struct Game {
-    string name;
-    int n, m;
-    int mines;
-    GameMode mode;
-    bool multiplayer;
-
+    public string name;
+    public int n, m;
+    public int mines;
+    public GameMode mode;
+    public bool multiplayer;
+    //konstruktor
     public Game(string name, int n, int m, int mines, GameMode mode, bool multiplayer)
     {
         this.name = name;
@@ -23,11 +23,19 @@ public struct Game {
         this.mines = mines;
         this.mode = mode;
         this.multiplayer = multiplayer;
-    }
+    }  
 }
 public class GameManager : MonoBehaviour {
+
+
+    public GameObject fieldPrefab;
+
+
+
+
+
     public static GameManager singleton;
-    public static Game regular = new Game("Regular", 10, 10, 10, GameMode.REGULAR, false);
+    public static Game regular = new Game("Regular", 15, 15, 10, GameMode.REGULAR, false);
     public Game actualGame;
 
 
@@ -38,6 +46,13 @@ public class GameManager : MonoBehaviour {
     {
         singleton = this;
         SceneManager.activeSceneChanged += SceneChanged;
+
+       
+    }
+
+    private void Start()
+    {
+        StartGame(); //DEBUG
     }
     private void SceneChanged(Scene from, Scene to)
     {
@@ -45,9 +60,15 @@ public class GameManager : MonoBehaviour {
         if(to.name == "Game")
         {
             timeText = References.singleton.timeText;
+            StartGame();
         }
     }
+    public static void StartRegular()
+    {
+        singleton.actualGame = regular;
 
+        SceneManager.LoadScene("Game");
+    }
 
 
 
@@ -60,10 +81,12 @@ public class GameManager : MonoBehaviour {
 void StartGame() //játék indítása
     {
         counter = StartCoroutine(Counter());
+        actualGame = regular;
+        SetupGrid();
     }
 	IEnumerator Counter() //számláló
     {
-      //  Console.Log("Timer started");
+      Console.Log("Timer started");
         time = 0;
      
         while(true)
@@ -75,4 +98,21 @@ void StartGame() //játék indítása
     }
     
     
+
+    void SetupGrid()
+    {
+        Transform parent = GameObject.Find("GRID").transform;
+        for(int i = 0; i < actualGame.m;i++)
+        {
+            for(int j = 0; j < actualGame.n;j++)
+            {
+                Instantiate(fieldPrefab, new Vector3(i+0.5f, j+0.5f, 0), Quaternion.identity, parent);
+            }
+        }
+
+        parent.position = new Vector3(-actualGame.n / 2, -actualGame.n / 2, 0);
+        CameraControl.singleton.AlignCamera(actualGame.n);
+    }
+
+   
 }
