@@ -1490,6 +1490,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8409d5926954daa4a9f838ebe2d6748b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fieldPrefab: {fileID: 1863952729584766, guid: edb8a11bc40a92b4bba2f3736fa46301,
+    type: 2}
   timeText: {fileID: 0}
 --- !u!114 &114203963901937062
 MonoBehaviour:

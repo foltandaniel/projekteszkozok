@@ -16,6 +16,13 @@ public class CameraControl : MonoBehaviour {
 
 
     Camera cam;
+
+
+	float minX;
+	float maxX;
+	float minY;
+	float maxY;
+
     private float origCamScale;
     private float minZoom;
     private float mapSize;
@@ -33,7 +40,8 @@ public class CameraControl : MonoBehaviour {
     }
     // Update is called once per frame
     void Update() {
-
+		if (!GameManager.PLAYING)
+			return;
         //DRAG
         if (Input.GetMouseButtonDown(0)) { //ha nyomjuk a bal egér gombot (vagy touch0)
             dragDistance = 0f;
@@ -48,21 +56,13 @@ public class CameraControl : MonoBehaviour {
             dragDistance += (startMousePos - nowMousePos).magnitude; //mennyit ment eddig a kurzor?
             newPos = transform.position + startMousePos - nowMousePos; //a kamerát mozgatjuk (azon van ez a script)
 
+			//RefreshBounds ();
 
 
 
 
-            var vertExtent = cam.orthographicSize;
-            var horzExtent = vertExtent * Screen.width / Screen.height;
-
-            // Calculations assume map is position at the origin
-            var minX = horzExtent - (mapSize+5f) / 2.0f;
-            var maxX = (mapSize + 5f) / 2.0f - horzExtent;
-            var minY = vertExtent - (mapSize + 30f) / 2.0f;
-            var maxY = (mapSize + 30f) / 2.0f - vertExtent;
-
-            newPos.x = Mathf.Clamp(newPos.x, minX, maxX);
-            newPos.y = Mathf.Clamp(newPos.y, minY, maxY);
+           // newPos.x = Mathf.Clamp(newPos.x, minX, maxX);
+           // newPos.y = Mathf.Clamp(newPos.y, minY, maxY);
             transform.position = newPos;
         }
 
@@ -76,6 +76,19 @@ public class CameraControl : MonoBehaviour {
         }
     }
 
+	private void RefreshBounds(){
+
+		var vertExtent = cam.orthographicSize;
+		var horzExtent = vertExtent * Screen.width / Screen.height;
+
+		// Calculations assume map is position at the origin
+		minX = horzExtent - (mapSize+5f) / 2.0f;
+		maxX = (mapSize + 5f) / 2.0f - horzExtent;
+		minY = vertExtent - (mapSize + 30f) / 2.0f;
+		maxY = (mapSize + 30f) / 2.0f - vertExtent;
+	}
+
+
 
     public void Zoom(bool inorout) //true = nagyítás
     {
@@ -87,14 +100,17 @@ public class CameraControl : MonoBehaviour {
         {
            if(cam.orthographicSize < minZoom) cam.orthographicSize += zoomSpeed;
         }
+		RefreshBounds ();
     }
 
     public void AlignCamera(int n)
     {
+		
         mapSize = n;
         cam.orthographicSize =n;
        // cam.transform.position = new Vector3(n / 2f, n / 2f, -10);
         origCamScale = n;
         minZoom =n;
+		RefreshBounds ();
     }
 }

@@ -10,22 +10,35 @@ public enum GameMode
 }
 public struct Game {
     public string name;
-    public int n, m;
+    public int n;
     public int mines;
     public GameMode mode;
     public bool multiplayer;
     //konstruktor
-    public Game(string name, int n, int m, int mines, GameMode mode, bool multiplayer)
+    public Game(string name, int n, int mines, GameMode mode, bool multiplayer)
     {
         this.name = name;
         this.n = n;
-        this.m = m;
         this.mines = mines;
         this.mode = mode;
         this.multiplayer = multiplayer;
+
+
     }  
+	public override string ToString() {
+		return mode.ToString();
+	}
 }
 public class GameManager : MonoBehaviour {
+
+
+	public static bool PLAYING;
+	private int[,] field; 
+	//map
+	//akna -1
+	//számok 0-8
+
+	private List<Vector2> minePositions;
 
 
     public GameObject fieldPrefab;
@@ -35,7 +48,7 @@ public class GameManager : MonoBehaviour {
 
 
     public static GameManager singleton;
-    public static Game regular = new Game("Regular", 15, 15, 10, GameMode.REGULAR, false);
+    public static Game regular = new Game("Regular", 15, 10, GameMode.REGULAR, false);
     public Game actualGame;
 
 
@@ -44,7 +57,11 @@ public class GameManager : MonoBehaviour {
     int time;
     void Awake()
     {
-        singleton = this;
+		if (!singleton != null) {
+			Console.Log ("Game Manager already exists!!");
+		} else {
+			singleton = this;
+		}
         SceneManager.activeSceneChanged += SceneChanged;
 
        
@@ -52,27 +69,70 @@ public class GameManager : MonoBehaviour {
 
     private void Start()
     {
-        StartGame(); //DEBUG
+		//actualGame = regular;
+       // StartGame(); //DEBUG
     }
     private void SceneChanged(Scene from, Scene to)
     {
         Console.Log("SCENE CHANGE: "+ from.name + "->" + to.name);
-        if(to.name == "Game")
-        {
-            timeText = References.singleton.timeText;
-            StartGame();
-        }
+		if (to.name == "Game") {
+			timeText = References.singleton.timeText;
+			StartGame ();
+		} else {
+			PLAYING = false;
+		}
     }
     public static void StartRegular()
     {
         singleton.actualGame = regular;
-
+		Debug.Log ("actual game set");
         SceneManager.LoadScene("Game");
     }
 
 
 
+	void GenerateMines(int minecount){
+		minePositions = new List<Vector2> ();
+		int size = actualGame.n;
 
+		while (minePositions.Count < minecount) {
+			Vector2 mine = new Vector2 (
+		    Random.Range (0, size),
+			Random.Range (0, size));
+			if(!minePositions.Contains(mine)){
+				minePositions.Add (mine);
+				//Debug.Log(mine.x +" " + mine.y);// pozíciók kiírása
+			}
+		}
+	}
+
+	private void TryToAddOne(int x, int y){
+		int n = actualGame.n;
+		if (x < 0 || x >= n || y < 0 || y >= n) {
+			return;
+		}
+		if(field [x, y] == -1){
+			return;
+		}
+		field [x, y]++;
+		//Debug.Log ("Adding mine to " + x + " " + y + "!");
+	}
+
+
+
+	private void FillMatrix(){
+		foreach(Vector2 mine in minePositions){
+			field[(int)mine.x, (int)mine.y] = -1;
+			for (int i = -1; i <= 1; i++) {
+				for (int j = -1; j <= 1; j++) {
+					TryToAddOne ((int)mine.x + i, (int)mine.y + j);
+				}
+			}
+
+			//TryToAddOne ((int)mine.x-1,(int)mine.y-1);
+
+		}
+	}
 
 
 
@@ -80,9 +140,17 @@ public class GameManager : MonoBehaviour {
 
 void StartGame() //játék indítása
     {
+		Console.Log("game mode: " + actualGame);
+		field = new int[actualGame.n, actualGame.n];
+		GenerateMines (actualGame.mines);
+		FillMatrix ();
+
         counter = StartCoroutine(Counter());
-        actualGame = regular;
+       // actualGame = regular;
         SetupGrid();
+
+
+
     }
 	IEnumerator Counter() //számláló
     {
@@ -102,16 +170,20 @@ void StartGame() //játék indítása
     void SetupGrid()
     {
         Transform parent = GameObject.Find("GRID").transform;
-        for(int i = 0; i < actualGame.m;i++)
+        for(int i = 0; i < actualGame.n;i++)
         {
             for(int j = 0; j < actualGame.n;j++)
             {
-                Instantiate(fieldPrefab, new Vector3(i+0.5f, j+0.5f, 0), Quaternion.identity, parent);
+                GameObject go = Instantiate(fieldPrefab, new Vector3(i+0.5f, j+0.5f, 0), Quaternion.identity, parent);
+				Field currentfield = go.GetComponent<Field> ();
+				currentfield.Setup (field [i, j]);
             }
         }
 
         parent.position = new Vector3(-actualGame.n / 2, -actualGame.n / 2, 0);
+		Debug.Log ("grid setup size: " + actualGame.n);
         CameraControl.singleton.AlignCamera(actualGame.n);
+		PLAYING = true;
     }
 
    

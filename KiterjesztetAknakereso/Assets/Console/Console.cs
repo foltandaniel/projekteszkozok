@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
+
+
 public class Console : MonoBehaviour {
     private static Console singleton;
     private Transform parent;
@@ -25,12 +28,16 @@ public class Console : MonoBehaviour {
     }
     private void MSG(string msg)
     {
+		try {
         Instantiate(consoleElementPrefab, parent).GetComponent<Text>().text = msg;
         Debug.Log(msg);
 
         Canvas.ForceUpdateCanvases();
         scroll.verticalScrollbar.value = 0.001f;
         Canvas.ForceUpdateCanvases();
+		} catch(Exception ex) {
+			Debug.Log ("No console: " + msg);
+		}
     }
     void Update()
     {
