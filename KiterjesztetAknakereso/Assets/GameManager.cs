@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System;
 
 public enum GameMode
 {
@@ -29,48 +30,64 @@ public struct Game {
 		return mode.ToString();
 	}
 }
+
+public struct FieldStruct
+{
+    public int value;
+    public Field fieldClass;
+}
 public class GameManager : MonoBehaviour {
 
-
 	public static bool PLAYING;
-	private int[,] field; 
-	//map
-	//akna -1
-	//számok 0-8
-
-	private List<Vector2> minePositions;
-
-
-    public GameObject fieldPrefab;
-
-
-
-
-
     public static GameManager singleton;
     public static Game regular = new Game("Regular", 15, 10, GameMode.REGULAR, false);
     public Game actualGame;
 
-
+    public GameObject fieldPrefab;
     public Text timeText;
+
+    public Texture[] textures;
+    /* 0 - akna
+     * 1 - 0
+     * 2 - 1
+     * stb...
+    */
+
+
+    private FieldStruct[,] field;
+    //map
+    //akna -1
+    //számok 0-8
+
+    //private Dictionary<Vector2, Field> fieldMap = new Dictionary<Vector2, Field>();
+	private List<Vector2> minePositions;
+
+
+   
+
+
+
+
+
+   
+
+   
     Coroutine counter; //referencia a számláló funkcióra, hogy megtudjuk állítani
     int time;
     void Awake()
     {
-		if (!singleton != null) {
-			Console.Log ("Game Manager already exists!!");
-		} else {
+		
 			singleton = this;
-		}
         SceneManager.activeSceneChanged += SceneChanged;
 
        
     }
 
+   
     private void Start()
     {
 		//actualGame = regular;
-       // StartGame(); //DEBUG
+       //StartGame(); //DEBUG
     }
     private void SceneChanged(Scene from, Scene to)
     {
@@ -97,8 +114,8 @@ public class GameManager : MonoBehaviour {
 
 		while (minePositions.Count < minecount) {
 			Vector2 mine = new Vector2 (
-		    Random.Range (0, size),
-			Random.Range (0, size));
+		    UnityEngine.Random.Range (0, size),
+		    UnityEngine.Random.Range (0, size));
 			if(!minePositions.Contains(mine)){
 				minePositions.Add (mine);
 				//Debug.Log(mine.x +" " + mine.y);// pozíciók kiírása
@@ -111,10 +128,10 @@ public class GameManager : MonoBehaviour {
 		if (x < 0 || x >= n || y < 0 || y >= n) {
 			return;
 		}
-		if(field [x, y] == -1){
+		if(field [x, y].value == -1){
 			return;
 		}
-		field [x, y]++;
+		field [x, y].value++;
 		//Debug.Log ("Adding mine to " + x + " " + y + "!");
 	}
 
@@ -122,7 +139,7 @@ public class GameManager : MonoBehaviour {
 
 	private void FillMatrix(){
 		foreach(Vector2 mine in minePositions){
-			field[(int)mine.x, (int)mine.y] = -1;
+			field[(int)mine.x, (int)mine.y].value = -1;
 			for (int i = -1; i <= 1; i++) {
 				for (int j = -1; j <= 1; j++) {
 					TryToAddOne ((int)mine.x + i, (int)mine.y + j);
@@ -141,7 +158,11 @@ public class GameManager : MonoBehaviour {
 void StartGame() //játék indítása
     {
 		Console.Log("game mode: " + actualGame);
-		field = new int[actualGame.n, actualGame.n];
+
+
+        References.singleton.mines.text = actualGame.mines.ToString();
+
+		field = new FieldStruct[actualGame.n, actualGame.n];
 		GenerateMines (actualGame.mines);
 		FillMatrix ();
 
@@ -169,6 +190,7 @@ void StartGame() //játék indítása
 
     void SetupGrid()
     {
+        
         Transform parent = GameObject.Find("GRID").transform;
         for(int i = 0; i < actualGame.n;i++)
         {
@@ -176,7 +198,15 @@ void StartGame() //játék indítása
             {
                 GameObject go = Instantiate(fieldPrefab, new Vector3(i+0.5f, j+0.5f, 0), Quaternion.identity, parent);
 				Field currentfield = go.GetComponent<Field> ();
-				currentfield.Setup (field [i, j]);
+
+                field[i, j].fieldClass = currentfield;
+
+
+                currentfield.Setup(field[i, j].value,
+                    i, j,
+                    (field[i, j].value == -1), //akna -e?
+                    textures[field[i, j].value + 1] //textúra.
+                );
             }
         }
 
@@ -186,5 +216,49 @@ void StartGame() //játék indítása
 		PLAYING = true;
     }
 
-   
+
+    private void CheckIfZero(int x,int y)
+    {
+        int n = actualGame.n;
+        if (x < 0 || x >= n || y < 0 || y >= n)
+        {
+            return;
+        }
+
+
+        if(field[x,y].value == 0 )
+        {
+            field[x,y].fieldClass.ClickedMe();
+        }
+
+    }
+    public void Clicked(int x,int y)
+    {
+
+        //Console.Log("Clicked on " + x + "," + y);
+
+
+        int whatIsIt = field[x,y].value; //(int) mert vector2 floatot tárol..
+
+        if(whatIsIt == 0)
+        {
+            CheckIfZero(x - 1, y);
+            CheckIfZero(x+1,y);
+            CheckIfZero(x,y-1);
+            CheckIfZero(x,y+1);
+        }
+
+
+
+
+        if (whatIsIt == -1) // :( (akna)
+        {
+            EndGame();
+        }
+    }
+
+    private void EndGame()
+    {
+        throw new NotImplementedException();
+    }
 }

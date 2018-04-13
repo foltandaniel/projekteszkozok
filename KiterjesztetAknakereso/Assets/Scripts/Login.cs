@@ -8,7 +8,7 @@ public class Login : MonoBehaviour {
     public static string playerName = "Player";
     public static Login singleton;
     public GameObject form;
-    public InputField name, pw;
+    public InputField inputName, pw;
     void Awake()
     {
         singleton = this;

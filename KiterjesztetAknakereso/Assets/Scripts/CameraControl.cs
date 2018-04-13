@@ -45,12 +45,12 @@ public class CameraControl : MonoBehaviour {
         //DRAG
         if (Input.GetMouseButtonDown(0)) { //ha nyomjuk a bal egér gombot (vagy touch0)
             dragDistance = 0f;
-            startMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition); //hol nyomtuk le az egeret?
+            startMousePos = cam.ScreenToWorldPoint(Input.mousePosition); //hol nyomtuk le az egeret?
             startMousePos.z = 0.0f;
         }
 
         if (Input.GetMouseButton(0)) { //ha nyomva TARTJUK az egeret
-            Vector3 nowMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition); //hol van most a kurzor? (World pozíció)
+            Vector3 nowMousePos = cam.ScreenToWorldPoint(Input.mousePosition); //hol van most a kurzor? (World pozíció)
             nowMousePos.z = 0.0f;
             Vector3 newPos;
             dragDistance += (startMousePos - nowMousePos).magnitude; //mennyit ment eddig a kurzor?
@@ -61,8 +61,8 @@ public class CameraControl : MonoBehaviour {
 
 
 
-           // newPos.x = Mathf.Clamp(newPos.x, minX, maxX);
-           // newPos.y = Mathf.Clamp(newPos.y, minY, maxY);
+           newPos.x = Mathf.Clamp(newPos.x, minX, maxX);
+           newPos.y = Mathf.Clamp(newPos.y, minY, maxY);
             transform.position = newPos;
         }
 
@@ -70,12 +70,27 @@ public class CameraControl : MonoBehaviour {
         if (Input.GetMouseButtonUp(0)) { //felengedtük a gombot
 
             if (dragDistance < distanceThreshold) { //ha kevesebbet ment a kurzor, mint a threshold.
-                Debug.Log("CLICK"); //klikk
+                Click();
             }
 
         }
     }
+    private void Click()
+    {
+        RaycastHit2D hit;
 
+        hit = Physics2D.Raycast(cam.ScreenToWorldPoint(Input.mousePosition),cam.transform.forward);
+
+        if(hit)
+        {
+            if (!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+            {
+                hit.collider.gameObject.GetComponent<Field>().ClickedMe();
+            }
+        }
+
+
+    }
 	private void RefreshBounds(){
 
 		var vertExtent = cam.orthographicSize;
@@ -92,9 +107,10 @@ public class CameraControl : MonoBehaviour {
 
     public void Zoom(bool inorout) //true = nagyítás
     {
+        
         if(inorout)
         {
-            cam.orthographicSize -= zoomSpeed;
+            if( cam.orthographicSize > 4) cam.orthographicSize -= zoomSpeed;
            
         } else
         {

@@ -9,7 +9,7 @@ public class ScoreboardUI : MonoBehaviour {
     private Transform contentList;
 	public void Refresh()
     {
-        for(int i = 0; i < contentList.GetChildCount();i++)
+        for(int i = 0; i < contentList.childCount;i++)
         {
             Destroy(contentList.GetChild(i).gameObject);
         }

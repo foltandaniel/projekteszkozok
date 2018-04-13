@@ -12,8 +12,8 @@ public class Backend : MonoBehaviour {
 
 
 
-    [SerializeField]
-    private GameObject waiting;
+
+    public GameObject waiting;
     void Awake()
     {
        singleton = this;    
