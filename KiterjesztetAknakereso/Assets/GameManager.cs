@@ -39,8 +39,9 @@ public struct FieldStruct
 public class GameManager : MonoBehaviour {
 
 	public static bool PLAYING;
+	private bool firstClick;
     public static GameManager singleton;
-    public static Game regular = new Game("Regular", 15, 10, GameMode.REGULAR, false);
+    public static Game regular = new Game("Regular", 15, 45, GameMode.REGULAR, false);
     public Game actualGame;
 
     public GameObject fieldPrefab;
@@ -86,8 +87,8 @@ public class GameManager : MonoBehaviour {
    
     private void Start()
     {
-		//actualGame = regular;
-       //StartGame(); //DEBUG
+		actualGame = regular;
+       StartGame(); //DEBUG
     }
     private void SceneChanged(Scene from, Scene to)
     {
@@ -108,55 +109,13 @@ public class GameManager : MonoBehaviour {
 
 
 
-	void GenerateMines(int minecount){
-		minePositions = new List<Vector2> ();
-		int size = actualGame.n;
-
-		while (minePositions.Count < minecount) {
-			Vector2 mine = new Vector2 (
-		    UnityEngine.Random.Range (0, size),
-		    UnityEngine.Random.Range (0, size));
-			if(!minePositions.Contains(mine)){
-				minePositions.Add (mine);
-				//Debug.Log(mine.x +" " + mine.y);// pozíciók kiírása
-			}
-		}
-	}
-
-	private void TryToAddOne(int x, int y){
-		int n = actualGame.n;
-		if (x < 0 || x >= n || y < 0 || y >= n) {
-			return;
-		}
-		if(field [x, y].value == -1){
-			return;
-		}
-		field [x, y].value++;
-		//Debug.Log ("Adding mine to " + x + " " + y + "!");
-	}
-
-
-
-	private void FillMatrix(){
-		foreach(Vector2 mine in minePositions){
-			field[(int)mine.x, (int)mine.y].value = -1;
-			for (int i = -1; i <= 1; i++) {
-				for (int j = -1; j <= 1; j++) {
-					TryToAddOne ((int)mine.x + i, (int)mine.y + j);
-				}
-			}
-
-			//TryToAddOne ((int)mine.x-1,(int)mine.y-1);
-
-		}
-	}
-
 
 
 
 
 void StartGame() //játék indítása
     {
+		firstClick = true;
 		Console.Log("game mode: " + actualGame);
 
 
@@ -166,11 +125,16 @@ void StartGame() //játék indítása
 		GenerateMines (actualGame.mines);
 		FillMatrix ();
 
-        counter = StartCoroutine(Counter());
+       
        // actualGame = regular;
         SetupGrid();
 
+		References.singleton.StartTip.SetActive (true);
 
+
+
+
+		PLAYING = true;
 
     }
 	IEnumerator Counter() //számláló
@@ -213,7 +177,7 @@ void StartGame() //játék indítása
         parent.position = new Vector3(-actualGame.n / 2, -actualGame.n / 2, 0);
 		Debug.Log ("grid setup size: " + actualGame.n);
         CameraControl.singleton.AlignCamera(actualGame.n);
-		PLAYING = true;
+
     }
 
 
@@ -226,15 +190,24 @@ void StartGame() //játék indítása
         }
 
 
-        if(field[x,y].value == 0 )
-        {
-            field[x,y].fieldClass.ClickedMe();
-        }
+     //   if(field[x,y].value == 0 )
+     //   {
+            field[x,y].fieldClass.ClickedMe(true);
+      //  }
+
 
     }
+
+
+
+
     public void Clicked(int x,int y)
     {
-
+		if(firstClick) {
+			counter = StartCoroutine(Counter());
+			Destroy(References.singleton.StartTip);
+			firstClick = false;
+		}
         //Console.Log("Clicked on " + x + "," + y);
 
 
@@ -242,20 +215,65 @@ void StartGame() //játék indítása
 
         if(whatIsIt == 0)
         {
-            CheckIfZero(x - 1, y);
-            CheckIfZero(x+1,y);
-            CheckIfZero(x,y-1);
-            CheckIfZero(x,y+1);
+			for (int i = -1; i <= 1; i++) {
+				for (int j = -1; j <= 1; j++) {
+					CheckIfZero(x + i, y + j);
+				}
+			}
         }
-
-
-
-
         if (whatIsIt == -1) // :( (akna)
         {
             EndGame();
         }
     }
+
+
+	void GenerateMines(int minecount){
+		minePositions = new List<Vector2> ();
+
+
+
+
+
+		int size = actualGame.n;
+
+		while (minePositions.Count < minecount) {
+			Vector2 mine = new Vector2 (
+				UnityEngine.Random.Range (0, size),
+				UnityEngine.Random.Range (0, size));
+			if(!minePositions.Contains(mine)){
+				minePositions.Add (mine);
+				//Debug.Log(mine.x +" " + mine.y);// pozíciók kiírása
+			}
+		}
+	}
+
+	private void TryToAddOne(int x, int y){
+		int n = actualGame.n;
+		if (x < 0 || x >= n || y < 0 || y >= n) {
+			return;
+		}
+		if(field [x, y].value == -1){
+			return;
+		}
+		field [x, y].value++;
+		//Debug.Log ("Adding mine to " + x + " " + y + "!");
+	}
+
+	private void FillMatrix(){
+		foreach(Vector2 mine in minePositions){
+			field[(int)mine.x, (int)mine.y].value = -1;
+			for (int i = -1; i <= 1; i++) {
+				for (int j = -1; j <= 1; j++) {
+					TryToAddOne ((int)mine.x + i, (int)mine.y + j);
+				}
+			}
+
+			//TryToAddOne ((int)mine.x-1,(int)mine.y-1);
+
+		}
+	}
+
 
     private void EndGame()
     {

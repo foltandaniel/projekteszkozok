@@ -4,28 +4,33 @@ using UnityEngine;
 
 public class CameraControl : MonoBehaviour {
 
+	Camera cam;
     public static CameraControl singleton;
-    public float zoomSpeed = 0.5f;
+    
 
 
 
-    private Vector3 startMousePos;
+    private Vector3 startMousePos; //ahol lenyomtuk az egeret
     public float distanceThreshold = 1f; // legalább ennyit kell elmozdulnia a kurzornak, hogy ne számítson kattintásnak
     private float dragDistance; //mennyit mozgott a kurzor?
+	private float touchTime; //mikor nyomtuk le?
+	private float touchTimeThreshold =0.5f;
+	private bool ignoreMouseUp;
+	private Coroutine holdDownCoroutine;
 
-
-
-    Camera cam;
-
-
+	#region camera bounds
 	float minX;
 	float maxX;
 	float minY;
 	float maxY;
-
-    private float origCamScale;
+	private float mapSize;
+	#endregion
+   
+	#region zoom
+	private float origCamScale;
     private float minZoom;
-    private float mapSize;
+	public float zoomSpeed = 0.5f;
+    #endregion
 
 
 
@@ -38,18 +43,32 @@ public class CameraControl : MonoBehaviour {
         singleton = this;
         cam = GetComponent<Camera>();
     }
+
+	IEnumerator HoldDownTimer() {
+		
+		yield return new WaitForSeconds (touchTimeThreshold);
+		if (dragDistance < distanceThreshold) {
+			ignoreMouseUp = true;
+			Click (true);
+		}
+	}
     // Update is called once per frame
     void Update() {
 		if (!GameManager.PLAYING)
 			return;
         //DRAG
         if (Input.GetMouseButtonDown(0)) { //ha nyomjuk a bal egér gombot (vagy touch0)
+			
+			holdDownCoroutine = StartCoroutine (HoldDownTimer());
             dragDistance = 0f;
             startMousePos = cam.ScreenToWorldPoint(Input.mousePosition); //hol nyomtuk le az egeret?
             startMousePos.z = 0.0f;
         }
 
         if (Input.GetMouseButton(0)) { //ha nyomva TARTJUK az egeret
+
+
+
             Vector3 nowMousePos = cam.ScreenToWorldPoint(Input.mousePosition); //hol van most a kurzor? (World pozíció)
             nowMousePos.z = 0.0f;
             Vector3 newPos;
@@ -68,24 +87,35 @@ public class CameraControl : MonoBehaviour {
 
 
         if (Input.GetMouseButtonUp(0)) { //felengedtük a gombot
+			if(ignoreMouseUp) {
+				ignoreMouseUp = false;
+				return;
+			}
+			StopCoroutine (holdDownCoroutine);
+			if (dragDistance < distanceThreshold) { //ha kevesebbet ment a kurzor, mint a threshold.
+				float deltaTime = Time.timeSinceLevelLoad - touchTime;
 
-            if (dragDistance < distanceThreshold) { //ha kevesebbet ment a kurzor, mint a threshold.
-                Click();
-            }
+					Click (false);
+				 
 
+			}
         }
     }
-    private void Click()
+
+	private void Click(bool _long)
     {
         RaycastHit2D hit;
-
         hit = Physics2D.Raycast(cam.ScreenToWorldPoint(Input.mousePosition),cam.transform.forward);
 
         if(hit)
         {
             if (!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
             {
-                hit.collider.gameObject.GetComponent<Field>().ClickedMe();
+				if (_long) {
+					hit.collider.gameObject.GetComponent<Field> ().FlagMe ();
+				} else {
+					hit.collider.gameObject.GetComponent<Field> ().ClickedMe (false);
+				}
             }
         }
 

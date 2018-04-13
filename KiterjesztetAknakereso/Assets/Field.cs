@@ -6,11 +6,12 @@ using UnityEngine;
 public class Field : MonoBehaviour {
 
     private int x,y;
-    bool alreadyClicked,amIMine;
+    bool alreadyClicked,amIMine,flagged;
 
 
     //refs
     public Renderer front;
+	public Renderer back;
     private Animator anim;
     void Start()
     {
@@ -30,11 +31,25 @@ public class Field : MonoBehaviour {
 
 	}
 
-
-    public void ClickedMe()
+	public void FlagMe() {
+		if(!flagged) {
+			back.material.color = Color.red;
+			flagged = true;
+		} else {
+			back.material.color = Color.white;
+			flagged = false;
+		}
+	}
+	public void ClickedMe(bool logic)
+	/* logic -- az algoritmus fordtotta-e át a fieldet (pl 0 szomszédja..) */
     {
         if (alreadyClicked) return;
+		if(flagged) { 
+			back.material.color = Color.white;
+			flagged = false;
 
+			if (!logic) return; //ha kézzel kattintottunk rá, és flaggelve van, akkor ne forduljon át 
+		}
         anim.Play("Turn");
         alreadyClicked = true;
         GameManager.singleton.Clicked(x,y);
