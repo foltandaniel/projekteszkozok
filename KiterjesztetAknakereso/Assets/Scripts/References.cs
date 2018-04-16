@@ -6,7 +6,7 @@ public class References : MonoBehaviour {
     public Text timeText;
 
     public Text mines;
-
+    public EndGameGUI endGUI;
 	public GameObject StartTip;
     public static References singleton;
     void Awake()

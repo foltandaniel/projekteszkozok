@@ -33,30 +33,36 @@ public class Field : MonoBehaviour {
 
 	public void FlagMe() {
 		if(!flagged) {
-			back.material.color = Color.red;
+            GameManager.singleton.FlagCount(+1);
+            back.material.color = Color.red;
 			flagged = true;
 		} else {
 			back.material.color = Color.white;
-			flagged = false;
+            GameManager.singleton.FlagCount(-1);
+            flagged = false;
 		}
 	}
 	public void ClickedMe(bool logic)
 	/* logic -- az algoritmus fordtotta-e át a fieldet (pl 0 szomszédja..) */
     {
         if (alreadyClicked) return;
-		if(flagged) { 
+		if(flagged) {
+            GameManager.singleton.FlagCount(-1);
 			back.material.color = Color.white;
 			flagged = false;
 
 			if (!logic) return; //ha kézzel kattintottunk rá, és flaggelve van, akkor ne forduljon át 
 		}
-        anim.Play("Turn");
+        TurnMe();
         alreadyClicked = true;
         GameManager.singleton.Clicked(x,y);
     
 
 
         
+    }
+    public void TurnMe() {
+        if(!alreadyClicked) anim.Play("Turn");
     }
 
 }

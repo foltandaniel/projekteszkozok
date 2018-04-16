@@ -13,7 +13,6 @@ public class CameraControl : MonoBehaviour {
     private Vector3 startMousePos; //ahol lenyomtuk az egeret
     public float distanceThreshold = 1f; // legalább ennyit kell elmozdulnia a kurzornak, hogy ne számítson kattintásnak
     private float dragDistance; //mennyit mozgott a kurzor?
-	private float touchTime; //mikor nyomtuk le?
 	private float touchTimeThreshold =0.5f;
 	private bool ignoreMouseUp;
 	private Coroutine holdDownCoroutine;
@@ -56,6 +55,8 @@ public class CameraControl : MonoBehaviour {
     void Update() {
 		if (!GameManager.PLAYING)
 			return;
+
+
         //DRAG
         if (Input.GetMouseButtonDown(0)) { //ha nyomjuk a bal egér gombot (vagy touch0)
 			
@@ -93,7 +94,7 @@ public class CameraControl : MonoBehaviour {
 			}
 			StopCoroutine (holdDownCoroutine);
 			if (dragDistance < distanceThreshold) { //ha kevesebbet ment a kurzor, mint a threshold.
-				float deltaTime = Time.timeSinceLevelLoad - touchTime;
+				
 
 					Click (false);
 				 
@@ -158,5 +159,23 @@ public class CameraControl : MonoBehaviour {
         origCamScale = n;
         minZoom =n;
 		RefreshBounds ();
+    }
+
+
+    public IEnumerator ResetCamera()
+    {
+        float time = 7f;
+        float speed = 1f;
+        Vector3 zero = new Vector3(0f, 0f, -10f);
+        while(time > 0)
+        {
+            time -= Time.deltaTime;
+
+            Vector3 pos = Vector3.Lerp(cam.transform.position, zero, Time.deltaTime * speed);
+            cam.transform.position = pos;
+            cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, mapSize, Time.deltaTime * speed);
+
+            yield return null;
+        }
     }
 }

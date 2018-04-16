@@ -20,6 +20,8 @@ public class MainMenu : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+
+        Screen.SetResolution(360, 640, false);
         Console.Log("MainMenu Start");
         animatorStack.Push(mainCanvas); //mainmenuvel kezdünk
     }

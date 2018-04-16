@@ -59,7 +59,7 @@ public class GameManager : MonoBehaviour {
     //map
     //akna -1
     //számok 0-8
-
+    int flaggedCount; //mennyi mező van flagelve?
     //private Dictionary<Vector2, Field> fieldMap = new Dictionary<Vector2, Field>();
 	private List<Vector2> minePositions;
 
@@ -77,8 +77,8 @@ public class GameManager : MonoBehaviour {
     int time;
     void Awake()
     {
-		
-			singleton = this;
+    
+		singleton = this;
         SceneManager.activeSceneChanged += SceneChanged;
 
        
@@ -87,8 +87,8 @@ public class GameManager : MonoBehaviour {
    
     private void Start()
     {
-		actualGame = regular;
-       StartGame(); //DEBUG
+		//actualGame = regular;
+      // StartGame(); //DEBUG
     }
     private void SceneChanged(Scene from, Scene to)
     {
@@ -115,6 +115,7 @@ public class GameManager : MonoBehaviour {
 
 void StartGame() //játék indítása
     {
+        flaggedCount = 0;
 		firstClick = true;
 		Console.Log("game mode: " + actualGame);
 
@@ -223,7 +224,7 @@ void StartGame() //játék indítása
         }
         if (whatIsIt == -1) // :( (akna)
         {
-            EndGame();
+            StartCoroutine(EndGame());
         }
     }
 
@@ -275,8 +276,27 @@ void StartGame() //játék indítása
 	}
 
 
-    private void EndGame()
+    private IEnumerator  EndGame()
     {
-        throw new NotImplementedException();
+        PLAYING = false;
+        StartCoroutine(CameraControl.singleton.ResetCamera());
+        StopCoroutine(counter);
+         References.singleton.endGUI.Lost();
+
+       foreach(FieldStruct fs in field)
+        {
+            fs.fieldClass.TurnMe();
+            yield return new WaitForSeconds(0.0001f);
+        }
+        
+
+       
+
+    }
+
+    public void FlagCount(int x)
+    {
+        flaggedCount += x;
+        References.singleton.mines.text = (actualGame.mines - flaggedCount).ToString();
     }
 }
