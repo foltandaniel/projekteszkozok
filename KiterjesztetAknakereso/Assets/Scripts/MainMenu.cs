@@ -64,6 +64,7 @@ public class MainMenu : MonoBehaviour {
 
     public void StartRegular()
     {
+        Backend.ShowHideLoad(true);
         GameManager.StartRegular();
     }
 }

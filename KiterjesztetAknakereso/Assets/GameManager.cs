@@ -35,6 +35,7 @@ public struct FieldStruct
 {
     public int value;
     public Field fieldClass;
+    public bool flooded; //volt-e már rajta a Flood? (endgame)
 }
 public class GameManager : MonoBehaviour {
 
@@ -68,8 +69,6 @@ public class GameManager : MonoBehaviour {
 
 
 
-
-
    
 
    
@@ -87,15 +86,15 @@ public class GameManager : MonoBehaviour {
    
     private void Start()
     {
-		//actualGame = regular;
-      // StartGame(); //DEBUG
+	   // actualGame = regular;
+       // StartLocalGame(); //DEBUG
     }
     private void SceneChanged(Scene from, Scene to)
     {
         Console.Log("SCENE CHANGE: "+ from.name + "->" + to.name);
 		if (to.name == "Game") {
 			timeText = References.singleton.timeText;
-			StartGame ();
+			StartLocalGame ();
 		} else {
 			PLAYING = false;
 		}
@@ -113,7 +112,7 @@ public class GameManager : MonoBehaviour {
 
 
 
-void StartGame() //játék indítása
+void StartLocalGame() //játék indítása
     {
         flaggedCount = 0;
 		firstClick = true;
@@ -136,6 +135,7 @@ void StartGame() //játék indítása
 
 
 		PLAYING = true;
+        Backend.ShowHideLoad(false);
 
     }
 	IEnumerator Counter() //számláló
@@ -224,7 +224,7 @@ void StartGame() //játék indítása
         }
         if (whatIsIt == -1) // :( (akna)
         {
-            StartCoroutine(EndGame());
+            EndGame(x,y);
         }
     }
 
@@ -276,21 +276,51 @@ void StartGame() //játék indítása
 	}
 
 
-    private IEnumerator  EndGame()
+    private void EndGame(int x,int y)
     {
         PLAYING = false;
         StartCoroutine(CameraControl.singleton.ResetCamera());
         StopCoroutine(counter);
          References.singleton.endGUI.Lost();
 
-       foreach(FieldStruct fs in field)
-        {
-            fs.fieldClass.TurnMe();
-            yield return new WaitForSeconds(0.0001f);
-        }
+        StartCoroutine(FloodAlgorithm(x, y));
         
 
        
+
+    }
+    IEnumerator FloodAlgorithm(int x, int y)
+    {
+        float delay = 0.03f;
+        try
+        {
+            if (field[x, y].flooded) { yield break; }
+
+            field[x, y].fieldClass.TurnMe();
+            field[x, y].flooded = true;
+        }
+        catch (IndexOutOfRangeException)
+        {
+            yield break;
+        }
+
+        StartCoroutine(FloodAlgorithm(x - 1, y));
+        yield return new WaitForSeconds(delay);
+        StartCoroutine(FloodAlgorithm(x, y - 1));
+        yield return new WaitForSeconds(delay);
+
+        StartCoroutine(FloodAlgorithm(x - 1, y - 1));
+        yield return new WaitForSeconds(delay);
+        StartCoroutine(FloodAlgorithm(x + 1, y));
+        yield return new WaitForSeconds(delay);
+        StartCoroutine(FloodAlgorithm(x, y + 1));
+        yield return new WaitForSeconds(delay);
+        StartCoroutine(FloodAlgorithm(x + 1, y + 1));
+        yield return new WaitForSeconds(delay);
+        StartCoroutine(FloodAlgorithm(x - 1, y + 1));
+        yield return new WaitForSeconds(delay);
+        StartCoroutine(FloodAlgorithm(x + 1, y - 1));
+
 
     }
 

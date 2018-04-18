@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CameraControl : MonoBehaviour {
 
@@ -11,6 +12,7 @@ public class CameraControl : MonoBehaviour {
 
 
     private Vector3 startMousePos; //ahol lenyomtuk az egeret
+    private readonly Vector3 invalidPos = new Vector3(-1f,-1f,-1f); // null érték helyett kell
     public float distanceThreshold = 1f; // legalább ennyit kell elmozdulnia a kurzornak, hogy ne számítson kattintásnak
     private float dragDistance; //mennyit mozgott a kurzor?
 	private float touchTimeThreshold =0.5f;
@@ -26,9 +28,10 @@ public class CameraControl : MonoBehaviour {
 	#endregion
    
 	#region zoom
-	private float origCamScale;
-    private float minZoom;
 	public float zoomSpeed = 0.5f;
+    public CanvasGroup zoomSliderCanvas;
+
+
     #endregion
 
 
@@ -56,9 +59,12 @@ public class CameraControl : MonoBehaviour {
 		if (!GameManager.PLAYING)
 			return;
 
+        if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()) return;
+       
 
-        //DRAG
-        if (Input.GetMouseButtonDown(0)) { //ha nyomjuk a bal egér gombot (vagy touch0)
+
+            //DRAG
+            if (Input.GetMouseButtonDown(0)) { //ha nyomjuk a bal egér gombot (vagy touch0)
 			
 			holdDownCoroutine = StartCoroutine (HoldDownTimer());
             dragDistance = 0f;
@@ -68,7 +74,7 @@ public class CameraControl : MonoBehaviour {
 
         if (Input.GetMouseButton(0)) { //ha nyomva TARTJUK az egeret
 
-
+            if (startMousePos == invalidPos) return;
 
             Vector3 nowMousePos = cam.ScreenToWorldPoint(Input.mousePosition); //hol van most a kurzor? (World pozíció)
             nowMousePos.z = 0.0f;
@@ -88,7 +94,10 @@ public class CameraControl : MonoBehaviour {
 
 
         if (Input.GetMouseButtonUp(0)) { //felengedtük a gombot
-			if(ignoreMouseUp) {
+
+            if (startMousePos == invalidPos) return;
+            
+            if (ignoreMouseUp) {
 				ignoreMouseUp = false;
 				return;
 			}
@@ -100,8 +109,12 @@ public class CameraControl : MonoBehaviour {
 				 
 
 			}
+            startMousePos = invalidPos;
         }
+
     }
+
+
 
 	private void Click(bool _long)
     {
@@ -135,7 +148,12 @@ public class CameraControl : MonoBehaviour {
 	}
 
 
-
+    public void SliderZoom(float value)
+    {
+        cam.orthographicSize =4 + (1-value) * (mapSize-4);
+       
+        RefreshBounds();
+    }
     public void Zoom(bool inorout) //true = nagyítás
     {
         
@@ -145,25 +163,25 @@ public class CameraControl : MonoBehaviour {
            
         } else
         {
-           if(cam.orthographicSize < minZoom) cam.orthographicSize += zoomSpeed;
+           if(cam.orthographicSize < mapSize) cam.orthographicSize += zoomSpeed;
         }
 		RefreshBounds ();
     }
 
     public void AlignCamera(int n)
     {
-		
+        Console.Log("Align camera: " + n);
         mapSize = n;
+        transform.GetChild(0).localScale *= n;
         cam.orthographicSize =n;
-       // cam.transform.position = new Vector3(n / 2f, n / 2f, -10);
-        origCamScale = n;
-        minZoom =n;
 		RefreshBounds ();
+
     }
 
 
     public IEnumerator ResetCamera()
     {
+        zoomSliderCanvas.interactable = false;
         float time = 7f;
         float speed = 1f;
         Vector3 zero = new Vector3(0f, 0f, -10f);
@@ -177,5 +195,17 @@ public class CameraControl : MonoBehaviour {
 
             yield return null;
         }
+
+
+
+
+
     }
+
+
+    public void SetSliderAlpha(float f)
+    {
+        zoomSliderCanvas.alpha = f;
+    }
+  
 }
