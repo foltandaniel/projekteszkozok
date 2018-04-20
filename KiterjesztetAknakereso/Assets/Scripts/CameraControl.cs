@@ -38,7 +38,7 @@ public class CameraControl : MonoBehaviour {
 
 
 
-
+    
 
     void Awake()
     {
@@ -59,7 +59,8 @@ public class CameraControl : MonoBehaviour {
 		if (!GameManager.PLAYING)
 			return;
 
-        if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()) return;
+        if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() ||
+            UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject != null) return;
        
 
 
@@ -81,7 +82,7 @@ public class CameraControl : MonoBehaviour {
             Vector3 newPos;
             dragDistance += (startMousePos - nowMousePos).magnitude; //mennyit ment eddig a kurzor?
             newPos = transform.position + startMousePos - nowMousePos; //a kamerát mozgatjuk (azon van ez a script)
-
+            if(dragDistance > distanceThreshold) zoomSliderCanvas.alpha = 0.2f;
 			//RefreshBounds ();
 
 
@@ -94,7 +95,7 @@ public class CameraControl : MonoBehaviour {
 
 
         if (Input.GetMouseButtonUp(0)) { //felengedtük a gombot
-
+            zoomSliderCanvas.alpha = 1f;
             if (startMousePos == invalidPos) return;
             
             if (ignoreMouseUp) {

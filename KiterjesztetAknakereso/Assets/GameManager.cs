@@ -291,7 +291,7 @@ void StartLocalGame() //játék indítása
     }
     IEnumerator FloodAlgorithm(int x, int y)
     {
-        float delay = 0.03f;
+        float delay = 0.06f;
         try
         {
             if (field[x, y].flooded) { yield break; }
