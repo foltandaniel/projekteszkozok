@@ -12,19 +12,26 @@ namespace web
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            MySqlDataReader dataReader = SqlLayer.Query("select * from scores order by score desc");
-            string data = "";
-
-            while (dataReader.Read())
+            using (SqlLayer sql = new SqlLayer()) // sql kapcsolat
+                //using végén bezár az sql kapcsolat
             {
-                // (id, username, score)
-                string name = dataReader.GetString(1);
-                string score = dataReader.GetString(2);
+               // Response.Write(sql.connectstring);
+                MySqlDataReader dataReader = sql.Query("select * from scores order by score desc");
+                string data = "";
 
-                data += name + "|" + score + "/"; 
+                while (dataReader.Read())
+                {
+                    // (id, username, score)
+                    
+                    string name = dataReader.GetString(1).ToString();
+                    string score = dataReader.GetString(2).ToString();
+
+                    data += name + "|" + score + "/";
+                }
+
+                Response.Write(data);
+               
             }
-
-            Response.Write(data);
         }
     }
 }
