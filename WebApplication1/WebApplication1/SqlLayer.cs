@@ -9,25 +9,34 @@ namespace web
     public static class SqlLayer
     {
         private static MySqlConnection connection;
-        public static string result;
+        
         static SqlLayer()
         {
             MySqlConnectionStringBuilder connectionString = new MySqlConnectionStringBuilder();
-            connectionString.Server = "194.182.67.11";
+            connectionString.Server = "127.0.0.1";
             connectionString.UserID = "foltandaniel";
             connectionString.Password = "wL7nX84PMhXbSqZj";
             connectionString.Database = "ASP_DB";
 
-            result = connectionString.ToString();
-
-            connection = new MySqlConnection(result);
-
-            Console.WriteLine(result);
+            connection = new MySqlConnection(connectionString.ToString());
+            connection.Open();
         }
 
-        public static string GetScoreBoard()
+
+        public static MySqlDataReader Query(string query)
         {
-            return result;
+            MySqlCommand command = new MySqlCommand(query);
+            command.Connection = connection;
+
+            return command.ExecuteReader();
+        }
+
+        public static int Execute(string query)
+        {
+            MySqlCommand command = new MySqlCommand(query);
+            command.Connection = connection;
+
+            return command.ExecuteNonQuery();
         }
     }
 }

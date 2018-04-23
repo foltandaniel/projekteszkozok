@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -11,7 +12,19 @@ namespace web
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            Response.Write(SqlLayer.GetScoreBoard());
+            MySqlDataReader dataReader = SqlLayer.Query("select * from scores order by score desc");
+            string data = "";
+
+            while (dataReader.Read())
+            {
+                // (id, username, score)
+                string name = dataReader.GetString(1);
+                string score = dataReader.GetString(2);
+
+                data += name + "|" + score + "/"; 
+            }
+
+            Response.Write(data);
         }
     }
 }
