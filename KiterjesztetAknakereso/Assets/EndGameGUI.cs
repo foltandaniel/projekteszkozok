@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -19,8 +20,18 @@ public class EndGameGUI : MonoBehaviour {
         result.text = "<color=red>Lost</color>";
         anim.Play("End");
     }
+
+    internal void Won()
+    {
+        result.text = "<color=green>Won</color>";
+        anim.Play("End");
+    }
+
+
     public void BackToMenu()
     {
         SceneManager.LoadScene("Menu");
     }
+
+    
 }

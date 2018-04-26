@@ -64,10 +64,9 @@ public class GameManager : MonoBehaviour {
     //private Dictionary<Vector2, Field> fieldMap = new Dictionary<Vector2, Field>();
 	private List<Vector2> minePositions;
 
-
+    private int remainingNotMineFields;
    
-
-
+    
 
    
 
@@ -133,11 +132,13 @@ void StartLocalGame() //játék indítása
 
 
 
-
+        remainingNotMineFields = actualGame.n * actualGame.n - actualGame.mines;
 		PLAYING = true;
         Backend.ShowHideLoad(false);
 
     }
+
+
 	IEnumerator Counter() //számláló
     {
       Console.Log("Timer started");
@@ -214,7 +215,14 @@ void StartLocalGame() //játék indítása
 
         int whatIsIt = field[x,y].value; //(int) mert vector2 floatot tárol..
 
-        if(whatIsIt == 0)
+        if (whatIsIt == -1) // :( (akna)
+        {
+            Loose(x, y);
+            return;
+        }
+
+
+        if (whatIsIt == 0)
         {
 			for (int i = -1; i <= 1; i++) {
 				for (int j = -1; j <= 1; j++) {
@@ -222,14 +230,39 @@ void StartLocalGame() //játék indítása
 				}
 			}
         }
-        if (whatIsIt == -1) // :( (akna)
-        {
-            EndGame(x,y);
-        }
+
+        IsEnd(x,y);
+
     }
 
 
-	void GenerateMines(int minecount){
+    private void IsEnd(int x, int y)
+    {
+        remainingNotMineFields--;
+        if (remainingNotMineFields <= 0)
+        {
+            Victory(x, y);
+        }
+    }
+
+    private void Victory(int x, int y)
+    {
+        PLAYING = false;
+        StartCoroutine(CameraControl.singleton.ResetCamera());
+        StopCoroutine(counter);
+        References.singleton.endGUI.Won();
+    }
+
+    private void Loose(int x, int y)
+    {
+        PLAYING = false;
+        StartCoroutine(CameraControl.singleton.ResetCamera());
+        StopCoroutine(counter);
+        References.singleton.endGUI.Lost();
+        StartCoroutine(FloodAlgorithm(x, y));
+    }
+
+    void GenerateMines(int minecount){
 		minePositions = new List<Vector2> ();
 
 
@@ -276,19 +309,9 @@ void StartLocalGame() //játék indítása
 	}
 
 
-    private void EndGame(int x,int y)
-    {
-        PLAYING = false;
-        StartCoroutine(CameraControl.singleton.ResetCamera());
-        StopCoroutine(counter);
-         References.singleton.endGUI.Lost();
+    
 
-        StartCoroutine(FloodAlgorithm(x, y));
-        
 
-       
-
-    }
     IEnumerator FloodAlgorithm(int x, int y)
     {
         float delay = 0.06f;
