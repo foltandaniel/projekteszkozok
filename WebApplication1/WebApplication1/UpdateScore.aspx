@@ -1,3 +1,3 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true"  Inherits="WebApplication1.UpdateScore" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true"  Inherits="web.UpdateScore" %>
 
 

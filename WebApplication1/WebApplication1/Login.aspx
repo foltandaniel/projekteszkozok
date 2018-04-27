@@ -1,2 +1,2 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true"  Inherits="WebApplication1.Login" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true"  Inherits="web.Login" %>
 

@@ -54,6 +54,8 @@
   <ItemGroup>
     <Content Include="Default.aspx" />
     <Content Include="GetScoretable.aspx" />
+    <Content Include="Login.aspx" />
+    <Content Include="UpdateScore.aspx" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -65,8 +67,17 @@
       <DependentUpon>GetScoretable.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="Login.aspx.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqlLayer.cs" />
+    <Compile Include="UpdateScore.aspx.cs">
+      <DependentUpon>UpdateScore.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
