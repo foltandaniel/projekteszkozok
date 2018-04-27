@@ -1,0 +1,12 @@
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Bb]in/
+[Pp]ackages/
+.vs/
+
+
+WebApplication1/Properties/PublishProfiles/FolderProfile1.pubxml.user
+

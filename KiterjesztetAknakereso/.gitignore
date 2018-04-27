@@ -13,7 +13,6 @@ ExportedObj/
 .consulo/
 *.csproj
 *.unityproj
-*.sln
 *.suo
 *.tmp
 *.user
@@ -33,3 +32,5 @@ sysinfo.txt
 *.apk
 *.unitypackage
 
+
+WebApplication1/pw.password

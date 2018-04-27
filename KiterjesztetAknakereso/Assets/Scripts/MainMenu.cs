@@ -25,6 +25,7 @@ public class MainMenu : MonoBehaviour {
 #endif
 
         Application.targetFrameRate = 30;
+
         Console.Log("MainMenu Start");
         animatorStack.Push(mainCanvas); //mainmenuvel kezdünk
     }
