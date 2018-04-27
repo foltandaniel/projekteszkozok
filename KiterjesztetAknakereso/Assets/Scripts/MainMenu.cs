@@ -23,6 +23,9 @@ public class MainMenu : MonoBehaviour {
 #if UNITY_STANDALONE_WIN
         Screen.SetResolution(360, 640, false);
 #endif
+
+        Application.targetFrameRate = 30;
+
         Console.Log("MainMenu Start");
         animatorStack.Push(mainCanvas); //mainmenuvel kezdünk
     }
