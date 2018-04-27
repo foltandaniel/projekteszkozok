@@ -51,7 +51,14 @@ namespace web
                                                   //using végén bezár az sql kapcsolat
             {
                 // Response.Write(sql.connectstring);
-                int count = int.Parse(sql.Query("select count(select * from users where username='"+user+"' and password='"+pass+"') as Count from users").ToString());
+                MySqlDataReader data = sql.Query("select count(username) from users where username='"+user+"' and password='"+pass+"'");
+                //data -bán lesz az adat. 1 sorból fog állni, hiszen count(username) selectet írtunk (1 sort ad vissza)
+
+                data.Read(); //a jelenlegi pointert tovább mozgatjuk (első sorra lépünk)
+
+
+               int count = data.GetInt32(0); //a jelenlegi sor 0-adik oszlopjára vagyunk kíváncsiak, ami egy int32
+                
                 return count == 1;
             }
         } 
@@ -62,8 +69,10 @@ namespace web
                                                   //using végén bezár az sql kapcsolat
             {
                 // Response.Write(sql.connectstring);
-                int count = int.Parse(sql.Query("select count(select * from users where token='"+token+"') as Count from users").ToString());
-                return count == 1;
+                MySqlDataReader data = sql.Query("select count(token) from users where token='"+token+"'");
+
+                data.Read();
+                return data.GetInt32(0) == 1;
             }
         }
 
