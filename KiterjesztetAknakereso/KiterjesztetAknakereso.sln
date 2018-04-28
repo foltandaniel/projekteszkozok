@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2017
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KiterjesztetAknakereso", "KiterjesztetAknakereso.csproj", "{F1CA7A16-3A8C-03AA-1210-7B64351532F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KiterjesztetAknakereso.Editor", "KiterjesztetAknakereso.Editor.csproj", "{5C2F5F0D-8790-1B35-A703-A6D081C07916}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F1CA7A16-3A8C-03AA-1210-7B64351532F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1CA7A16-3A8C-03AA-1210-7B64351532F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1CA7A16-3A8C-03AA-1210-7B64351532F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1CA7A16-3A8C-03AA-1210-7B64351532F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C2F5F0D-8790-1B35-A703-A6D081C07916}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C2F5F0D-8790-1B35-A703-A6D081C07916}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C2F5F0D-8790-1B35-A703-A6D081C07916}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C2F5F0D-8790-1B35-A703-A6D081C07916}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

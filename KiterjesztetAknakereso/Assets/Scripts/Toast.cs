@@ -10,13 +10,9 @@ public class Toast : MonoBehaviour {
     void Awake()
     {
         singleton = this;
-    }
-    // Use this for initialization
-    void Start () {
         animator = GetComponent<Animator>();
-      //  ShowToast("Test toast");
-	}
-	public static void ShowToast(string msg)
+    }
+	public static void Show(string msg)
     {
         singleton.toastmsg.text = msg;
         singleton.animator.Play("Toast");

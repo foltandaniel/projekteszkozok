@@ -59,7 +59,7 @@ public class GameDiscovery : NetworkDiscovery {
         if(!found)
         {
             found = true;
-            Toast.ShowToast("Found games on network!");
+            Toast.Show("Found games on network!");
         }
         ui.AddToScrollList(fromAddress, data);
 

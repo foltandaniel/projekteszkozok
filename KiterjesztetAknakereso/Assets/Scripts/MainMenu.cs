@@ -20,9 +20,12 @@ public class MainMenu : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-#if UNITY_STANDALONE_WIN
-        Screen.SetResolution(360, 640, false);
-#endif
+
+        if(Application.platform == RuntimePlatform.WindowsPlayer)
+        {
+            Console.Log("setting resolution..");
+            Screen.SetResolution(360, 640, false);
+        }
 
         Application.targetFrameRate = 30;
 

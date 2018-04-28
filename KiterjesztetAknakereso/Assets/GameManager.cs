@@ -72,6 +72,7 @@ public class GameManager : MonoBehaviour {
 
    
     Coroutine counter; //referencia a számláló funkcióra, hogy megtudjuk állítani
+    private WaitForSeconds floodWait = new WaitForSeconds(0.17f);
     int time;
     void Awake()
     {
@@ -314,7 +315,7 @@ void StartLocalGame() //játék indítása
 
     IEnumerator FloodAlgorithm(int x, int y)
     {
-        float delay = 0.06f;
+        yield return floodWait;
         try
         {
             if (field[x, y].flooded) { yield break; }
@@ -328,20 +329,20 @@ void StartLocalGame() //játék indítása
         }
 
         StartCoroutine(FloodAlgorithm(x - 1, y));
-        yield return new WaitForSeconds(delay);
+        
         StartCoroutine(FloodAlgorithm(x, y - 1));
-        yield return new WaitForSeconds(delay);
+
 
         StartCoroutine(FloodAlgorithm(x - 1, y - 1));
-        yield return new WaitForSeconds(delay);
+     
         StartCoroutine(FloodAlgorithm(x + 1, y));
-        yield return new WaitForSeconds(delay);
+
         StartCoroutine(FloodAlgorithm(x, y + 1));
-        yield return new WaitForSeconds(delay);
+     
         StartCoroutine(FloodAlgorithm(x + 1, y + 1));
-        yield return new WaitForSeconds(delay);
+
         StartCoroutine(FloodAlgorithm(x - 1, y + 1));
-        yield return new WaitForSeconds(delay);
+      
         StartCoroutine(FloodAlgorithm(x + 1, y - 1));
 
 
