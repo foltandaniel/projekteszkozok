@@ -58,6 +58,7 @@ public class CameraControl : MonoBehaviour {
 		}
 	}
 #if UNITY_ANDROID && !UNITY_EDITOR
+    //ANDROID UPDATE
     void Update() {
 		if (!GameManager.PLAYING)
 			return;
@@ -77,7 +78,7 @@ public class CameraControl : MonoBehaviour {
             Touch touchZero = Input.GetTouch(0);
             Touch touchOne = Input.GetTouch(1);
 
-            // Find megkeressük mind2 touch előző pozícióját
+            // megkeressük mind2 touch előző pozícióját
             Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
             Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
 
@@ -90,9 +91,8 @@ public class CameraControl : MonoBehaviour {
 
                 // ... zoom
                 cam.orthographicSize += deltaMagnitudeDiff *zoomSpeed;
+                cam.orthographicSize = Mathf.Clamp(cam.orthographicSize, 3f,mapSize); //ne zoomoljunk túl
 
-                // Make sure the orthographic size never drops below zero.
-                cam.orthographicSize = Mathf.Clamp(cam.orthographicSize, 3f,mapSize);
                 RefreshBounds();
             return;
         }

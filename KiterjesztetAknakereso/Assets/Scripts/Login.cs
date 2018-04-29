@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Login : MonoBehaviour {
@@ -16,7 +17,18 @@ public class Login : MonoBehaviour {
     void Awake()
     {
         singleton = this;
-       
+        SceneManager.activeSceneChanged += SceneChanged;
+    }
+    private void SceneChanged(Scene from, Scene to)
+    {
+        
+        if(to.name == "Menu")
+        {
+            if (LOGGED_IN)
+            {
+                GameObject.Find("LoginButton").GetComponentInChildren<Text>().text = "Logout";
+            }
+        }
     }
     private void Start()
     {
@@ -27,16 +39,17 @@ public class Login : MonoBehaviour {
     }
     public void TryLogin()
     {
-      if(!string.IsNullOrEmpty(token))
-        {
-            //TODO - lecsekkolni, hogy jó-e a token..
-            LoggedIn();
-            return;
-        }
-        StartCoroutine(Backend.singleton.SendLoginRequest(inputName.text,pw.text,LoginResult));
-        //backend -nek elküldjük az adatokat, illetve megmondjuk, hogy a LoginResult(ResultMSG msg) -t hívja meg utána
-        
+       
+            if (!string.IsNullOrEmpty(token))
+            {
+                //TODO - lecsekkolni, hogy jó-e a token..
+                LoggedIn();
+                return;
+            }
+            StartCoroutine(Backend.singleton.SendLoginRequest(inputName.text, pw.text, LoginResult));
+            //backend -nek elküldjük az adatokat, illetve megmondjuk, hogy a LoginResult(ResultMSG msg) -t hívja meg utána
 
+      
     }
     public void Register()
     {
@@ -49,7 +62,7 @@ public class Login : MonoBehaviour {
     public void LoggedIn()
     {
         LOGGED_IN = true;
-        GameObject.Find("LoginButton").SetActive(false);
+        GameObject.Find("LoginButton").GetComponentInChildren<Text>().text = "Logout";
         Toast.Show("Logged in!");
   
         Console.Log("playername: " + playerName);

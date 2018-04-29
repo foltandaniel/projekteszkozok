@@ -65,7 +65,14 @@ public class MainMenu : MonoBehaviour {
 
     public void ShowLogin()
     {
-        Login.Show();
+        if (Login.LOGGED_IN)
+        {
+            Toast.Show("Not implemented yet!");
+        }
+        else
+        {
+            Login.Show();
+        }
     }
 
 
