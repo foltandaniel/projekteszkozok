@@ -14,8 +14,15 @@ namespace web
         {
             //megkapja tokent és a score-t
             string token = Request.Form["token"];
-            int score = int.Parse( Request.Form["score"]);
-
+			
+			
+			// Ellenőrizzük az inputot
+            int score = 0;
+			if (Request.Form["score"] != null)
+			{
+				score = int.Parse( Request.Form["score"]);
+			}
+			
             //tokennel létrehozunk egy playert
             Player player = new Player(token);
 
