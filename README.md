@@ -1,7 +1,6 @@
 #Projekteszközök beadandó
 
-Commit után Travis automatikusan buildel
-Build kihagyása: [ci skip] a commit üzenetbe
+Projektünk egy aknakereső játék, amely sikeres build után a következő helyen érhető el:
+http://194.182.67.11/MineSweeper/
 
-Sikeres build után elérhető összecsomagolva:
-https://zetya96.000webhostapp.com/build.zip
+A projekt Unity-ben készült és egy Asp.net alapú backend található mögötte.
