@@ -47,6 +47,10 @@ public class GameManager : MonoBehaviour {
 
     public GameObject fieldPrefab;
     public Text timeText;
+	public Text pointText;
+	private int point;
+	private int multiplier=0;
+		
 
     public Texture[] textures;
     /* 0 - akna
@@ -94,6 +98,7 @@ public class GameManager : MonoBehaviour {
         Console.Log("SCENE CHANGE: "+ from.name + "->" + to.name);
 		if (to.name == "Game") {
 			timeText = References.singleton.timeText;
+			pointText = References.singleton.pointText;
 			StartLocalGame ();
 		} else {
 			PLAYING = false;
@@ -148,6 +153,7 @@ void StartLocalGame() //játék indítása
         while(true)
         {
             timeText.text = (time / 60).ToString("00") + ":" + (time % 60).ToString("00");
+			multiplier = 6-(Math.Min((time / 60),5));
             time++;
             yield return new WaitForSeconds(1f); //másodpercenként menjen a ciklus
         }
@@ -209,6 +215,7 @@ void StartLocalGame() //játék indítása
 		if(firstClick) {
 			counter = StartCoroutine(Counter());
 			Destroy(References.singleton.StartTip);
+			point = 0;
 			firstClick = false;
 		}
         //Console.Log("Clicked on " + x + "," + y);
@@ -216,12 +223,8 @@ void StartLocalGame() //játék indítása
 
         int whatIsIt = field[x,y].value; //(int) mert vector2 floatot tárol..
 
-        if (whatIsIt == -1) // :( (akna)
-        {
-            Loose(x, y);
-            return;
-        }
-
+        
+		CalculatePoint (whatIsIt);
 
         if (whatIsIt == 0)
         {
@@ -232,13 +235,27 @@ void StartLocalGame() //játék indítása
 			}
         }
 
-        IsEnd(x,y);
+		IsEnd(x,y,whatIsIt);
 
     }
 
+	private void CalculatePoint(int actualNumber){
+		if(actualNumber<1){
+			return;
+		}
+		point = point + actualNumber * multiplier;
+		pointText.text = point.ToString();
+		//Debug.Log ("Added point: ["+ (point - actualNumber * multiplier) +" + "+ (actualNumber * multiplier) +"] (actual number: "+actualNumber+" * multiplier: "+multiplier+")");
 
-    private void IsEnd(int x, int y)
+	}
+
+	private void IsEnd(int x, int y, int actualNumber)
     {
+		if (actualNumber == -1) // :( (akna)
+		{
+			Loose(x, y);
+			return;
+		}
         remainingNotMineFields--;
         if (remainingNotMineFields <= 0)
         {
@@ -252,6 +269,8 @@ void StartLocalGame() //játék indítása
         StartCoroutine(CameraControl.singleton.ResetCamera());
         StopCoroutine(counter);
         References.singleton.endGUI.Won();
+
+		StartCoroutine (Backend.singleton.SendScore(point));
     }
 
     private void Loose(int x, int y)
@@ -260,13 +279,16 @@ void StartLocalGame() //játék indítása
         StartCoroutine(CameraControl.singleton.ResetCamera());
         StopCoroutine(counter);
         References.singleton.endGUI.Lost();
+
         StartCoroutine(FloodAlgorithm(x, y));
+		StartCoroutine (Backend.singleton.SendScore(point));
+
+
+
     }
 
     void GenerateMines(int minecount){
 		minePositions = new List<Vector2> ();
-
-
 
 
 

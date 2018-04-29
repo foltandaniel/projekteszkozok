@@ -62,7 +62,6 @@ public class Backend : MonoBehaviour {
          * ez azért kell, mert IEnumerator "aszinkron"-ban fut, ahol meghívjuk a függvény a következő sorban még NINCS meg
          * az eredmény */
     {
-        yield return new WaitForSeconds(3f);
         Console.Log("Downloading scoreboard"); 
         WWW www = new WWW(SCOREBOARD_URL);
         yield return www;
@@ -101,6 +100,19 @@ public class Backend : MonoBehaviour {
 
 
     }
+	public IEnumerator SendScore(int score) {
+		if (!Login.LOGGED_IN) //nem vagyunk belépve..
+			yield break;
+
+
+		WWWForm form = new WWWForm ();
+		form.AddField ("token", Login.token);
+		form.AddField ("score", score);
+
+		WWW www = new WWW ("http://194.182.67.11/asp/UpdateScore.aspx",form);
+		yield return www;
+		Console.Log ("Response from Updatescore: " + www.text);
+	}
 
 
 

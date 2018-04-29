@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.Text;
+using System.Security.Cryptography;
 
 public class Login : MonoBehaviour {
     public static bool LOGGED_IN = false;
@@ -46,14 +48,15 @@ public class Login : MonoBehaviour {
                 LoggedIn();
                 return;
             }
-            StartCoroutine(Backend.singleton.SendLoginRequest(inputName.text, pw.text, LoginResult));
+
+		StartCoroutine(Backend.singleton.SendLoginRequest(inputName.text,  MD5Hash(pw.text), LoginResult));
             //backend -nek elküldjük az adatokat, illetve megmondjuk, hogy a LoginResult(ResultMSG msg) -t hívja meg utána
 
       
     }
     public void Register()
     {
-        Toast.Show("Not yet!");
+		Application.OpenURL ("http://194.182.67.11/asp/Register.aspx");
     }
     public void Offline()
     {
@@ -118,5 +121,34 @@ public class Login : MonoBehaviour {
             Toast.Show(result.msg);
         }
     }
-    
+	public static void Logout() {
+		singleton.StartCoroutine(singleton.LogoutCoroutine());
+		Toast.Show ("Logged out!");
+	}
+	IEnumerator LogoutCoroutine() {
+		WWWForm form = new WWWForm ();
+		form.AddField ("token", token);
+		WWW www = new WWW ("http://194.182.67.11/asp/Logout.aspx", form);
+		yield return www;
+
+
+		SaveTokenAndName ("", "");
+		LOGGED_IN = false;
+		GameObject.Find("LoginButton").GetComponentInChildren<Text>().text = "Login";
+
+	}
+
+
+	public static string MD5Hash(string input)
+	{
+		StringBuilder hash = new StringBuilder();
+		MD5CryptoServiceProvider md5provider = new MD5CryptoServiceProvider();
+		byte[] bytes = md5provider.ComputeHash(new UTF8Encoding().GetBytes(input));
+
+		for (int i = 0; i < bytes.Length; i++)
+		{
+			hash.Append(bytes[i].ToString("x2"));
+		}
+		return hash.ToString();
+	}
 }

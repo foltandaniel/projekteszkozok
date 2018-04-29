@@ -67,7 +67,7 @@ public class MainMenu : MonoBehaviour {
     {
         if (Login.LOGGED_IN)
         {
-            Toast.Show("Not implemented yet!");
+			Login.Logout ();
         }
         else
         {
