@@ -22,7 +22,7 @@ namespace web
 			{
 				score = int.Parse( Request.Form["score"]);
 			}
-			
+            Response.Write("Checking user..");
             //tokennel létrehozunk egy playert
             Player player = new Player(token);
 
@@ -31,7 +31,7 @@ namespace web
                 //ha valid a token lekérjük a felhasználót
                 String user = player.getUser();
                 int oldScore = -1;
-                String worstId = "";
+                int worstId = -1;
                 int worstScore = -1;
 
                 //lekérjük a legrosszabb játékos id, score párosát
@@ -46,11 +46,12 @@ namespace web
                     {
                         // (id, username, score)
 
-                        worstId = dataReader.GetString(0).ToString();
+                        worstId = dataReader.GetInt32(0);
                         worstScore = int.Parse(dataReader.GetString(2).ToString());
                         
                     }
-
+                    dataReader.Close();
+                    Response.Write("worst id: " + worstId);
                     //lekérjük a felhasználó eddigi legjobb eredményét
                     dataReader = sql.Query("select TopScore from users where username='" + user + "'");
                     while (dataReader.Read())
@@ -59,7 +60,8 @@ namespace web
                         oldScore = int.Parse(dataReader.GetString(0).ToString());
 
                     }
-
+                    dataReader.Close();
+                    Response.Write("oldscore: " + oldScore);
                     //ha jobb eredményt ért el akkor frissítünk
                     if (oldScore < score)
                     {

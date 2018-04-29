@@ -16,12 +16,12 @@ namespace web
             Player player = new Player(username, password);
             if (player.getStatus() == true)
             {
-                Response.Write("OK|" + player.getToken() + "/");
+                Response.Write("OK|" + player.getToken());
             }
 
             else
             {
-                Response.Write("HIBA|nem megfelelő felhasználó jelszó páros /");
+                Response.Write("HIBA|nem megfelelő felhasználó jelszó páros");
             }
 
         }
