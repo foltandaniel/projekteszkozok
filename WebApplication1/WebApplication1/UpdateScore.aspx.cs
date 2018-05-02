@@ -13,6 +13,11 @@ namespace web
         protected void Page_Load(object sender, EventArgs e)
         {
             //megkapja tokent és a score-t
+
+            if (Request.Form["token"] == null)
+            {
+                return;
+            }
             string token = Request.Form["token"];
 			
 			

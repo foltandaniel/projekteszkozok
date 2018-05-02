@@ -12,6 +12,7 @@ namespace web
         private String user;
         private String token;
         private bool status; // valid felhasznalo vagy nem
+        private int score;
         public Player(String username, String password) //loginhoz felhasználó jelszó kombinációval hívjuk meg
         {
             user = username;
@@ -144,9 +145,10 @@ namespace web
 
                 while (dataReader.Read())
                 {
-                    // (id, username, pass,token)
+                    // (id, username, pass,token,score)
 
                     name = dataReader.GetString(1).ToString();
+                    score = dataReader.GetInt32(4);
                     
                 }
 
@@ -170,6 +172,11 @@ namespace web
         public String getUser()
         {
             return user;
+        }
+
+        public int getScore()
+        {
+            return score;
         }
     }
 }
