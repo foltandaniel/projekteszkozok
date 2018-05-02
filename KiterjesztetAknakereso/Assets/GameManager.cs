@@ -97,6 +97,7 @@ public class GameManager : MonoBehaviour {
     {
         Console.Log("SCENE CHANGE: "+ from.name + "->" + to.name);
 		if (to.name == "Game") {
+			StopAllCoroutines ();
 			timeText = References.singleton.timeText;
 			pointText = References.singleton.pointText;
 			StartLocalGame ();
@@ -111,9 +112,11 @@ public class GameManager : MonoBehaviour {
         SceneManager.LoadScene("Game");
     }
 
+	public static void StartCustom(Game game) {
+		singleton.actualGame = game;
+		SceneManager.LoadScene ("Game");
 
-
-
+	}
 
 
 
@@ -270,7 +273,7 @@ void StartLocalGame() //játék indítása
         StopCoroutine(counter);
         References.singleton.endGUI.Won();
 
-		StartCoroutine (Backend.singleton.SendScore(point));
+		if(actualGame.mode == GameMode.REGULAR) StartCoroutine (Backend.singleton.SendScore(point));
     }
 
     private void Loose(int x, int y)
