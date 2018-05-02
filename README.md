@@ -13,3 +13,5 @@ Az aknakereső apk file-ja androidon telepítés után tesztelhető.
 
 Unity-ben a projekt a következőképpen tesztelhető: Scenes/Menu-t kell megnyitni és azt futtatni Unity-n belül. Offline módban tesztelhető a játék. Unity-n belül az aspect ratio-t 9:16-ra kell állítani, ekkor tesztelhető a játék. Builden belül a felbontás jó, ott nem kell külön állítani rajta.
 
+A build futtatásakor lehet regisztrálni és be is lehet jelentkezni. Bejelentkezés után a Scoreboard-on megtekinthetőek az elért eredmények.
+
