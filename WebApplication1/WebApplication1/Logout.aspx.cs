@@ -11,6 +11,10 @@ namespace web
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (Request.Form["token"]==null)
+            {
+                return;
+            }
             Player user = new Player(Request.Form["token"].ToString());
 
             using (SqlLayer sql = new SqlLayer())
