@@ -107,12 +107,14 @@ public class GameManager : MonoBehaviour {
     }
     public static void StartRegular()
     {
+		Backend.ShowHideLoad(true);
         singleton.actualGame = regular;
 		Debug.Log ("actual game set");
         SceneManager.LoadScene("Game");
     }
 
 	public static void StartCustom(Game game) {
+		Backend.ShowHideLoad(true);
 		singleton.actualGame = game;
 		SceneManager.LoadScene ("Game");
 
