@@ -20,9 +20,12 @@ public class MainMenu : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-#if UNITY_STANDALONE_WIN
-        Screen.SetResolution(360, 640, false);
-#endif
+
+        if(Application.platform == RuntimePlatform.WindowsPlayer)
+        {
+            Console.Log("setting resolution..");
+            Screen.SetResolution(360, 640, false);
+        }
 
         Application.targetFrameRate = 30;
 
@@ -62,13 +65,20 @@ public class MainMenu : MonoBehaviour {
 
     public void ShowLogin()
     {
-        Login.Show();
+        if (Login.LOGGED_IN)
+        {
+			Login.Logout ();
+        }
+        else
+        {
+            Login.Show();
+        }
     }
 
 
     public void StartRegular()
     {
-        Backend.ShowHideLoad(true);
+       
         GameManager.StartRegular();
     }
 }

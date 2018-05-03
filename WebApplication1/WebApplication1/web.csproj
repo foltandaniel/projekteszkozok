@@ -45,14 +45,17 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+
     <Reference Include="MySql.Data, Version=6.9.9.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+
     <Content Include="CheckToken.aspx" />
     <Content Include="Default.aspx" />
     <Content Include="GetScoretable.aspx" />
@@ -60,14 +63,17 @@
     <Content Include="Logout.aspx" />
     <Content Include="PersonalRecord.aspx" />
     <Content Include="Register.aspx" />
+
     <Content Include="UpdateScore.aspx" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+
     <Compile Include="CheckToken.aspx.cs">
       <DependentUpon>CheckToken.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+
     <Compile Include="Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -80,6 +86,7 @@
       <DependentUpon>Login.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+
     <Compile Include="Logout.aspx.cs">
       <DependentUpon>Logout.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -97,6 +104,7 @@
     <Compile Include="Register.aspx.designer.cs">
       <DependentUpon>Register.aspx</DependentUpon>
     </Compile>
+
     <Compile Include="SqlLayer.cs" />
     <Compile Include="UpdateScore.aspx.cs">
       <DependentUpon>UpdateScore.aspx</DependentUpon>

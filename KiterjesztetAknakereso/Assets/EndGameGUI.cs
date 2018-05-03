@@ -32,6 +32,10 @@ public class EndGameGUI : MonoBehaviour {
     {
         SceneManager.LoadScene("Menu");
     }
+    public void PlayAgain()
+    {
+        SceneManager.LoadScene("Game");
+    }
 
     
 }

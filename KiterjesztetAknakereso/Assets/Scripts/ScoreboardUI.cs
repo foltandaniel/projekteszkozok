@@ -9,10 +9,7 @@ public class ScoreboardUI : MonoBehaviour {
     private Transform contentList;
 	public void Refresh()
     {
-        for(int i = 0; i < contentList.childCount;i++)
-        {
-            Destroy(contentList.GetChild(i).gameObject);
-        }
+      
         Backend.ShowHideLoad(true);
         Console.Log("Start GetScoreboard");
         StartCoroutine(Backend.singleton.GetScoreboard(new UnityEngine.Events.UnityAction<string[]>(ScoreboardDownloaded)));
@@ -20,6 +17,10 @@ public class ScoreboardUI : MonoBehaviour {
 
     void ScoreboardDownloaded(string[] scores)
     {
+		for(int i = 0; i < contentList.childCount;i++)
+		{
+			Destroy(contentList.GetChild(i).gameObject);
+		}
         Backend.ShowHideLoad(false);
         Console.Log("Scoreboard refresh");
         int index = 1;

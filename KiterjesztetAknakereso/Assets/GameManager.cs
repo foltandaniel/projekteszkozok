@@ -47,6 +47,10 @@ public class GameManager : MonoBehaviour {
 
     public GameObject fieldPrefab;
     public Text timeText;
+	public Text pointText;
+	private int point;
+	private int multiplier=0;
+		
 
     public Texture[] textures;
     /* 0 - akna
@@ -72,6 +76,7 @@ public class GameManager : MonoBehaviour {
 
    
     Coroutine counter; //referencia a számláló funkcióra, hogy megtudjuk állítani
+    private WaitForSeconds floodWait = new WaitForSeconds(0.17f);
     int time;
     void Awake()
     {
@@ -92,7 +97,9 @@ public class GameManager : MonoBehaviour {
     {
         Console.Log("SCENE CHANGE: "+ from.name + "->" + to.name);
 		if (to.name == "Game") {
+			StopAllCoroutines ();
 			timeText = References.singleton.timeText;
+			pointText = References.singleton.pointText;
 			StartLocalGame ();
 		} else {
 			PLAYING = false;
@@ -100,14 +107,18 @@ public class GameManager : MonoBehaviour {
     }
     public static void StartRegular()
     {
+		Backend.ShowHideLoad(true);
         singleton.actualGame = regular;
 		Debug.Log ("actual game set");
         SceneManager.LoadScene("Game");
     }
 
+	public static void StartCustom(Game game) {
+		Backend.ShowHideLoad(true);
+		singleton.actualGame = game;
+		SceneManager.LoadScene ("Game");
 
-
-
+	}
 
 
 
@@ -147,6 +158,7 @@ void StartLocalGame() //játék indítása
         while(true)
         {
             timeText.text = (time / 60).ToString("00") + ":" + (time % 60).ToString("00");
+			multiplier = 6-(Math.Min((time / 60),5));
             time++;
             yield return new WaitForSeconds(1f); //másodpercenként menjen a ciklus
         }
@@ -208,6 +220,7 @@ void StartLocalGame() //játék indítása
 		if(firstClick) {
 			counter = StartCoroutine(Counter());
 			Destroy(References.singleton.StartTip);
+			point = 0;
 			firstClick = false;
 		}
         //Console.Log("Clicked on " + x + "," + y);
@@ -215,12 +228,8 @@ void StartLocalGame() //játék indítása
 
         int whatIsIt = field[x,y].value; //(int) mert vector2 floatot tárol..
 
-        if (whatIsIt == -1) // :( (akna)
-        {
-            Loose(x, y);
-            return;
-        }
-
+        
+		CalculatePoint (whatIsIt);
 
         if (whatIsIt == 0)
         {
@@ -231,13 +240,27 @@ void StartLocalGame() //játék indítása
 			}
         }
 
-        IsEnd(x,y);
+		IsEnd(x,y,whatIsIt);
 
     }
 
+	private void CalculatePoint(int actualNumber){
+		if(actualNumber<1){
+			return;
+		}
+		point = point + actualNumber * multiplier;
+		pointText.text = point.ToString();
+		//Debug.Log ("Added point: ["+ (point - actualNumber * multiplier) +" + "+ (actualNumber * multiplier) +"] (actual number: "+actualNumber+" * multiplier: "+multiplier+")");
 
-    private void IsEnd(int x, int y)
+	}
+
+	private void IsEnd(int x, int y, int actualNumber)
     {
+		if (actualNumber == -1) // :( (akna)
+		{
+			Loose(x, y);
+			return;
+		}
         remainingNotMineFields--;
         if (remainingNotMineFields <= 0)
         {
@@ -251,6 +274,8 @@ void StartLocalGame() //játék indítása
         StartCoroutine(CameraControl.singleton.ResetCamera());
         StopCoroutine(counter);
         References.singleton.endGUI.Won();
+
+		if(actualGame.mode == GameMode.REGULAR) StartCoroutine (Backend.singleton.SendScore(point));
     }
 
     private void Loose(int x, int y)
@@ -259,13 +284,16 @@ void StartLocalGame() //játék indítása
         StartCoroutine(CameraControl.singleton.ResetCamera());
         StopCoroutine(counter);
         References.singleton.endGUI.Lost();
+
         StartCoroutine(FloodAlgorithm(x, y));
+		StartCoroutine (Backend.singleton.SendScore(point));
+
+
+
     }
 
     void GenerateMines(int minecount){
 		minePositions = new List<Vector2> ();
-
-
 
 
 
@@ -314,7 +342,7 @@ void StartLocalGame() //játék indítása
 
     IEnumerator FloodAlgorithm(int x, int y)
     {
-        float delay = 0.06f;
+        yield return floodWait;
         try
         {
             if (field[x, y].flooded) { yield break; }
@@ -328,20 +356,20 @@ void StartLocalGame() //játék indítása
         }
 
         StartCoroutine(FloodAlgorithm(x - 1, y));
-        yield return new WaitForSeconds(delay);
+        
         StartCoroutine(FloodAlgorithm(x, y - 1));
-        yield return new WaitForSeconds(delay);
+
 
         StartCoroutine(FloodAlgorithm(x - 1, y - 1));
-        yield return new WaitForSeconds(delay);
+     
         StartCoroutine(FloodAlgorithm(x + 1, y));
-        yield return new WaitForSeconds(delay);
+
         StartCoroutine(FloodAlgorithm(x, y + 1));
-        yield return new WaitForSeconds(delay);
+     
         StartCoroutine(FloodAlgorithm(x + 1, y + 1));
-        yield return new WaitForSeconds(delay);
+
         StartCoroutine(FloodAlgorithm(x - 1, y + 1));
-        yield return new WaitForSeconds(delay);
+      
         StartCoroutine(FloodAlgorithm(x + 1, y - 1));
 
 
