@@ -29,6 +29,8 @@ namespace web
                     data += name + "|" + score + "/";
                 }
 
+                data = data.Substring(0, data.Length - 1);
+
                 Response.Write(data);
                
             }

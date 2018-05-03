@@ -216,6 +216,14 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="bin/System.Web.Optimization.dll">
       <publishTime>02/11/2014 15:26:04</publishTime>
     </File>
+
+    <File Include="bin/web.dll">
+      <publishTime>04/29/2018 19:46:39</publishTime>
+    </File>
+    <File Include="bin/web.pdb">
+      <publishTime>04/29/2018 19:46:39</publishTime>
+    </File>
+
     <File Include="bin/WebApplication1.dll">
       <publishTime>04/24/2018 15:20:24</publishTime>
     </File>
@@ -226,13 +234,27 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>07/17/2013 17:03:52</publishTime>
     </File>
     <File Include="Default.aspx">
-      <publishTime>04/23/2018 21:04:14</publishTime>
+
+      <publishTime>04/29/2018 17:24:51</publishTime>
     </File>
     <File Include="GetScoretable.aspx">
-      <publishTime>04/23/2018 21:04:15</publishTime>
+      <publishTime>04/29/2018 17:24:51</publishTime>
+    </File>
+    <File Include="Login.aspx">
+      <publishTime>04/29/2018 17:24:51</publishTime>
+    </File>
+    <File Include="Logout.aspx">
+      <publishTime>04/29/2018 19:47:17</publishTime>
+    </File>
+    <File Include="Register.aspx">
+      <publishTime>04/29/2018 19:04:24</publishTime>
+    </File>
+    <File Include="UpdateScore.aspx">
+      <publishTime>04/29/2018 19:34:47</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>04/24/2018 15:20:24</publishTime>
+      <publishTime>04/29/2018 19:01:33</publishTime>
+
     </File>
   </ItemGroup>
 </Project>
