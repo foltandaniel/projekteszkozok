@@ -45,10 +45,9 @@ public class CustomGameStarter : MonoBehaviour {
 		mine.text=numberOfMines.ToString();
 	}
 
-	public void MapFieldLooseFocus(){
+	public void MapFieldLooseFocus(){//kikattintunk a mezőböl, átállítódnak az értékek a változókban
 		try{
 			ChangeMapSize(int.Parse(map.text));
-			//mapSize = int.Parse(map.text);
 		}catch(Exception e) {
 			Console.Log ("Exception in CustomGameStarter: " + e);
 			Toast.Show ("Invalid parameter!");
@@ -58,7 +57,7 @@ public class CustomGameStarter : MonoBehaviour {
 		FixPlayerMistakes ();
 	}
 
-	public void MineFieldLooseFocus(){
+	public void MineFieldLooseFocus(){//kikattintunk a mezőböl, átállítódnak az értékek a változókban
 		try{
 			ChangeNumberOfMines(int.Parse(mine.text));
 		}catch(Exception e) {
@@ -71,28 +70,21 @@ public class CustomGameStarter : MonoBehaviour {
 	}
 
 	private void FixPlayerMistakes(){
-		/*
 		MineValudation ();
-		MapValudation ();*/
+		MapValudation ();
 		if(numberOfMines>maxNumberOfMines){
 			ChangeNumberOfMines (maxNumberOfMines);
 		}
 	}
 
 
-	//melyik legyen?
 	private void MapValudation (){//alap változatlan
 		if (mapSize < minimumMapSize) {
 			ChangeMapSize (minimumMapSize);
-			/*mapSize = 0;
-			map.text=mapSize.ToString();*/
 			return;
 		}
 		if (mapSize > maximumMapSize) {
 			ChangeMapSize (maximumMapSize);
-			/*mapSize = 50;
-			map.text=mapSize.ToString();
-			maxNumberOfMines = (mapSize - 1) * (mapSize - 1);*/
 			return;
 		}
 
@@ -110,6 +102,7 @@ public class CustomGameStarter : MonoBehaviour {
 		return;
 	}
 
+	/*
 	private int MapValudation (int f){//sima értékvisszaadós
 		if (f < minimumMapSize) {
 			f=minimumMapSize;
@@ -120,9 +113,8 @@ public class CustomGameStarter : MonoBehaviour {
 			return f;
 		}
 		return f;
-	}
+	}*/
 
-	//melyik legyen?
 	private void MineValudation(){//alap változatlan
 		if (numberOfMines < minimumNumberOfMines) {
 			ChangeNumberOfMines (minimumNumberOfMines);
@@ -136,12 +128,13 @@ public class CustomGameStarter : MonoBehaviour {
 		}
 	}
 
+	/*
 	private int MineValudation( int f){//értékvisszaadós
 		if (f < minimumNumberOfMines) {
 			f=minimumNumberOfMines;
 		}
 		return f;
-	}
+	}*/
 
 	public void Play_Button() {
 		FixPlayerMistakes ();
