@@ -24,9 +24,8 @@ public struct Game {
         this.mines = mines;
         this.mode = mode;
         this.multiplayer = multiplayer;
+    }
 
-
-    }  
 	public override string ToString() {
 		return mode.ToString();
 	}
@@ -70,12 +69,7 @@ public class GameManager : MonoBehaviour {
 	private List<Vector2> minePositions;
 
     private int remainingNotMineFields;
-   
-    
 
-   
-
-   
     Coroutine counter; //referencia a számláló funkcióra, hogy megtudjuk állítani
     private WaitForSeconds floodWait = new WaitForSeconds(0.17f);
     int time;
@@ -84,16 +78,14 @@ public class GameManager : MonoBehaviour {
     
 		singleton = this;
         SceneManager.activeSceneChanged += SceneChanged;
-
-       
     }
-
    
     private void Start()
     {
 	   // actualGame = regular;
        // StartLocalGame(); //DEBUG
     }
+
     private void SceneChanged(Scene from, Scene to)
     {
         Console.Log("SCENE CHANGE: "+ from.name + "->" + to.name);
@@ -106,6 +98,7 @@ public class GameManager : MonoBehaviour {
 			PLAYING = false;
 		}
     }
+
     public static void StartRegular()
     {
 		Backend.ShowHideLoad(true);
@@ -121,9 +114,7 @@ public class GameManager : MonoBehaviour {
 
 	}
 
-
-
-void StartLocalGame() //játék indítása
+	void StartLocalGame() //játék indítása
     {
         flaggedCount = 0;
 		firstClick = true;
@@ -136,20 +127,15 @@ void StartLocalGame() //játék indítása
 		GenerateMines (actualGame.mines);
 		FillMatrix ();
 
-       
        // actualGame = regular;
         SetupGrid();
 
 		References.singleton.StartTip.SetActive (true);
 
-
-
         remainingNotMineFields = actualGame.n * actualGame.n - actualGame.mines;
 		PLAYING = true;
         Backend.ShowHideLoad(false);
-
     }
-
 
 	IEnumerator Counter() //számláló
     {
@@ -165,11 +151,8 @@ void StartLocalGame() //játék indítása
         }
     }
     
-    
-
     void SetupGrid()
     {
-        
         Transform parent = GameObject.Find("GRID").transform;
         for(int i = 0; i < actualGame.n;i++)
         {
@@ -180,7 +163,6 @@ void StartLocalGame() //játék indítása
 
                 field[i, j].fieldClass = currentfield;
 
-
                 currentfield.Setup(field[i, j].value,
                     i, j,
                     (field[i, j].value == -1), //akna -e?
@@ -188,13 +170,11 @@ void StartLocalGame() //játék indítása
                 );
             }
         }
-
         parent.position = new Vector3(-actualGame.n / 2, -actualGame.n / 2, 0);
 		Debug.Log ("grid setup size: " + actualGame.n);
         CameraControl.singleton.AlignCamera(actualGame.n);
 
     }
-
 
     private void CheckIfZero(int x,int y)
     {
@@ -203,18 +183,8 @@ void StartLocalGame() //játék indítása
         {
             return;
         }
-
-
-     //   if(field[x,y].value == 0 )
-     //   {
-            field[x,y].fieldClass.ClickedMe(true);
-      //  }
-
-
+		field[x,y].fieldClass.ClickedMe(true);
     }
-
-
-
 
     public void Clicked(int x,int y)
     {
@@ -226,10 +196,8 @@ void StartLocalGame() //játék indítása
 		}
         //Console.Log("Clicked on " + x + "," + y);
 
-
         int whatIsIt = field[x,y].value; //(int) mert vector2 floatot tárol..
 
-        
 		CalculatePoint (whatIsIt);
 
         if (whatIsIt == 0)
@@ -240,9 +208,7 @@ void StartLocalGame() //játék indítása
 				}
 			}
         }
-
 		IsEnd(x,y,whatIsIt);
-
     }
 
 	private void CalculatePoint(int actualNumber){
@@ -252,7 +218,6 @@ void StartLocalGame() //játék indítása
 		point = point + actualNumber * multiplier;
 		pointText.text = point.ToString();
 		//Debug.Log ("Added point: ["+ (point - actualNumber * multiplier) +" + "+ (actualNumber * multiplier) +"] (actual number: "+actualNumber+" * multiplier: "+multiplier+")");
-
 	}
 
 	private void IsEnd(int x, int y, int actualNumber)
@@ -288,15 +253,10 @@ void StartLocalGame() //játék indítása
 
         StartCoroutine(FloodAlgorithm(x, y));
 		StartCoroutine (Backend.singleton.SendScore(point));
-
-
-
     }
 
     void GenerateMines(int minecount){
 		minePositions = new List<Vector2> ();
-
-
 
 		int size = actualGame.n;
 
@@ -331,15 +291,9 @@ void StartLocalGame() //játék indítása
 					TryToAddOne ((int)mine.x + i, (int)mine.y + j);
 				}
 			}
-
 			//TryToAddOne ((int)mine.x-1,(int)mine.y-1);
-
 		}
 	}
-
-
-    
-
 
     IEnumerator FloodAlgorithm(int x, int y)
     {
@@ -347,7 +301,6 @@ void StartLocalGame() //játék indítása
         try
         {
             if (field[x, y].flooded) { yield break; }
-
             field[x, y].fieldClass.TurnMe();
             field[x, y].flooded = true;
         }
@@ -360,7 +313,6 @@ void StartLocalGame() //játék indítása
         
         StartCoroutine(FloodAlgorithm(x, y - 1));
 
-
         StartCoroutine(FloodAlgorithm(x - 1, y - 1));
      
         StartCoroutine(FloodAlgorithm(x + 1, y));
@@ -372,8 +324,6 @@ void StartLocalGame() //játék indítása
         StartCoroutine(FloodAlgorithm(x - 1, y + 1));
       
         StartCoroutine(FloodAlgorithm(x + 1, y - 1));
-
-
     }
 
     public void FlagCount(int x)
