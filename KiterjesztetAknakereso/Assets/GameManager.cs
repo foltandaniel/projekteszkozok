@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System;
+using UnityEngine.Networking;
+using UnityEngine.Networking.NetworkSystem;
 
 public enum GameMode
 {
@@ -37,6 +39,12 @@ public struct FieldStruct
     public int value;
     public Field fieldClass;
     public bool flooded; //volt-e már rajta a Flood? (endgame)
+}
+
+
+public static class MsgTypes
+{
+    public const int SERVER_LOADED = 0;
 }
 public class GameManager : MonoBehaviour {
 	
@@ -89,21 +97,34 @@ public class GameManager : MonoBehaviour {
     }
 
    
-    private void Start()
+    void Start()
     {
-	   // actualGame = regular;
-       // StartLocalGame(); //DEBUG
+        // actualGame = regular;
+        // StartLocalGame(); //DEBUG
+        // this should be somewhere else..
+       
     }
     private void SceneChanged(Scene from, Scene to)
     {
         Console.Log("SCENE CHANGE: "+ from.name + "->" + to.name);
 		if (to.name == "Game") {
-			StopAllCoroutines ();
+            PLAYING = false;
+            StopAllCoroutines ();
+            Dialog.Hide();
 			timeText = References.singleton.timeText;
 			pointText = References.singleton.pointText;
-			StartLocalGame ();
-		} else {
-			PLAYING = false;
+            if (actualGame.multiplayer) {
+
+                if (NetworkServer.active){ // mi vagyunk a szerver..
+                   
+                    StartMultiplayerGameAsHost();
+                }
+            }
+            else
+            {
+                StartLocalGame();
+            }
+			
 		}
     }
     public static void StartRegular()
@@ -149,9 +170,8 @@ void StartLocalGame() //játék indítása
         Backend.ShowHideLoad(false);
 
     }
-
-
-	IEnumerator Counter() //számláló
+   
+    IEnumerator Counter() //számláló
     {
       Console.Log("Timer started");
         time = 0;
@@ -380,5 +400,68 @@ void StartLocalGame() //játék indítása
     {
         flaggedCount += x;
         References.singleton.mines.text = (actualGame.mines - flaggedCount).ToString();
+
+
+    }
+
+    void StartMultiplayerGameAsHost() //játék indítása
+    {
+
+
+        flaggedCount = 0;
+        firstClick = true;
+        Console.Log("game mode: " + actualGame);
+
+
+        References.singleton.mines.text = actualGame.mines.ToString();
+
+        field = new FieldStruct[actualGame.n, actualGame.n];
+        GenerateMines(actualGame.mines);
+        FillMatrix();
+
+
+        // actualGame = regular;
+        SetupGrid();
+
+        References.singleton.StartTip.SetActive(true);
+
+
+        NetworkServer.SendToAll(100, new IntegerMessage(MsgTypes.SERVER_LOADED));
+
+        remainingNotMineFields = actualGame.n * actualGame.n - actualGame.mines; 
+
+
+
+
+    }
+    public void RegisterHandlers()
+    {
+        if (NetworkServer.active)
+        {
+            NetworkServer.RegisterHandler(100, MessageFromClient);
+        }
+        else
+        {
+            NetworkManager.singleton.client.RegisterHandler(100, MessageFromServer);
+        }
+
+        Console.Log("Registering message handlers");
+    }
+    void MessageFromServer(NetworkMessage msg )
+    {
+        int msgInt = msg.ReadMessage<IntegerMessage>().value;
+        Console.Log("Message from server:" + msgInt);
+        switch(msgInt)
+        {
+            case MsgTypes.SERVER_LOADED:
+                Console.Log("Message from server: READY");
+                SceneManager.LoadScene("Game");
+                break;
+        }
+    }
+ 
+    void MessageFromClient(NetworkMessage msg)
+    {
+
     }
 }

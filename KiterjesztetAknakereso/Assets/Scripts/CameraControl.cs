@@ -62,7 +62,7 @@ public class CameraControl : MonoBehaviour {
     void Update() {
 		if (!GameManager.PLAYING)
 			return;
-    
+    Debug.Log("Update");
         if (Input.touchCount == 0) return;
 
 
@@ -156,9 +156,9 @@ public class CameraControl : MonoBehaviour {
     //WINDOWS UPDATE
     void Update()
     {
-        if (!GameManager.PLAYING)
+        if (!GameManager.PLAYING) 
             return;
-
+        Debug.Log("update");
        if(Input.GetMouseButtonUp(0))
             /*ezt ide kell raknom, az IsPointerOver... elé, mert különben ha mozgok, 
              * és az egeret az átlátszó zoomslider felett engedem fel, akkor nem kapcsol vissza, hiszen ignorálva lesz az egész update..

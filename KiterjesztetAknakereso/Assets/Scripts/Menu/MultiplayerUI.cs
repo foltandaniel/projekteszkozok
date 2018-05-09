@@ -38,7 +38,7 @@ public class MultiplayerUI : MonoBehaviour {
 	public void StartGame() {
 		
         GameDiscovery.singleton.StartBroadcasting();
-       // GameNetworkManager.CreateGame();
+        GameNetworkManager.CreateGame();
         Dialog.Info("Waiting for opponent..", new UnityEngine.Events.UnityAction(delegate
          {
              GameDiscovery.singleton.Stop();
@@ -55,7 +55,21 @@ public class MultiplayerUI : MonoBehaviour {
         lobbys.Add(fromAddress);
         UpdateFoundMatchesText();
         GameObject instantiated = Instantiate (joinButtonPrefab, contentParent);
-		//TODO - funkció hozzáadása a létrehozott gombhoz..
+
+        instantiated.GetComponentInChildren<Button>().onClick.AddListener(new UnityEngine.Events.UnityAction(delegate
+        {
+            //kattintás
+            Dialog.Info("Connecting..", new UnityEngine.Events.UnityAction(delegate
+            {
+                //TODO -- CANCEL
+            }));
+
+
+            StopEverything();
+            GameNetworkManager.G_singleton.TryToConnect(fromAddress);
+
+
+        }));
 
 		instantiated.GetComponentInChildren<Text> ().text = data;
 	}
