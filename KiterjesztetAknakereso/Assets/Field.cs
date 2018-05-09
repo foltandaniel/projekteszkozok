@@ -33,23 +33,27 @@ public class Field : MonoBehaviour {
 
 	public void FlagMe() {
 		if(!flagged) {
-            GameManager.singleton.FlagCount(+1);
+			DoFlag ();
+            /*GameManager.singleton.FlagCount(+1);
             back.material.color = Color.red;
-			flagged = true;
+			flagged = true;*/
 		} else {
-			back.material.color = Color.white;
+			Unflag ();
+			/*back.material.color = Color.white;
             GameManager.singleton.FlagCount(-1);
-            flagged = false;
+            flagged = false;*/
 		}
 	}
+
 	public void ClickedMe(bool logic)
 	/* logic -- az algoritmus fordtotta-e át a fieldet (pl 0 szomszédja..) */
     {
         if (alreadyClicked) return;
 		if(flagged) {
-            GameManager.singleton.FlagCount(-1);
+			FlagMe ();
+            /*GameManager.singleton.FlagCount(-1);
 			back.material.color = Color.white;
-			flagged = false;
+			flagged = false;*/
 
 			if (!logic) return; //ha kézzel kattintottunk rá, és flaggelve van, akkor ne forduljon át 
 		}
@@ -62,7 +66,25 @@ public class Field : MonoBehaviour {
         
     }
     public void TurnMe() {
-        if(!alreadyClicked) anim.Play("Turn");
+		if (alreadyClicked) {
+			return;
+		}
+		anim.Play("Turn");
+
+		if(flagged&&GameManager.PLAYING){
+			FlagMe ();
+		}
     }
 
+	private void Unflag(){
+		GameManager.singleton.FlagCount(-1);
+		back.material.color = Color.white;
+		flagged = false;
+	}
+
+	private void DoFlag(){
+		GameManager.singleton.FlagCount(+1);
+		back.material.color = Color.red;
+		flagged = true;
+	}
 }

@@ -9,6 +9,7 @@ public enum GameMode
 {
     CUSTOM,REGULAR
 }
+
 public struct Game {
     public string name;
     public int n;
@@ -38,7 +39,7 @@ public struct FieldStruct
     public bool flooded; //volt-e már rajta a Flood? (endgame)
 }
 public class GameManager : MonoBehaviour {
-
+	
 	public static bool PLAYING;
 	private bool firstClick;
     public static GameManager singleton;
@@ -64,7 +65,7 @@ public class GameManager : MonoBehaviour {
     //map
     //akna -1
     //számok 0-8
-    int flaggedCount; //mennyi mező van flagelve?
+    private int flaggedCount; //mennyi mező van flagelve?
     //private Dictionary<Vector2, Field> fieldMap = new Dictionary<Vector2, Field>();
 	private List<Vector2> minePositions;
 
