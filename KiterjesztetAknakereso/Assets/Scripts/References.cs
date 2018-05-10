@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class References : MonoBehaviour {
     public Text timeText,pointText;
 
+    public Renderer gameBackground;
     public Text mines;
     public EndGameGUI endGUI;
 	public GameObject StartTip;

@@ -41,14 +41,25 @@ public struct FieldStruct
     public bool flooded; //volt-e már rajta a Flood? (endgame)
 }
 
-
-public static class MsgTypes
+public static class MessageTypes
 {
-    public const int SERVER_LOADED = 0;
+    public static short INTEGER_MESSAGE = 100;
+    public static short MINES_MESSAGE = 101;
+}
+public static class IntegerMessages
+{
+    public const int CLIENT_READY = 0;
+}
+
+
+class MinesMessage : MessageBase
+{
+    public Vector2[] mines;
+  
 }
 public class GameManager : MonoBehaviour {
 	
-	public static bool PLAYING;
+	public static bool PLAYING,MY_TURN;
 	private bool firstClick;
     public static GameManager singleton;
     public static Game regular = new Game("Regular", 15, 45, GameMode.REGULAR, false);
@@ -117,7 +128,15 @@ public class GameManager : MonoBehaviour {
 
                 if (NetworkServer.active){ // mi vagyunk a szerver..
                    
-                    StartMultiplayerGameAsHost();
+                    StartMultiplayerGame(true);
+                } else
+                {
+                    StartMultiplayerGame(false); // elindítjuk a gamet, de aknákat NEM kell generálni
+                    NetworkManager.singleton.client.Send(MessageTypes.INTEGER_MESSAGE, new IntegerMessage(IntegerMessages.CLIENT_READY));
+                    //szervernek küldünk infót, hogy kész vagyunk.
+
+                    NotMyTurn();
+                    Backend.ShowHideLoad(false);
                 }
             }
             else
@@ -127,11 +146,12 @@ public class GameManager : MonoBehaviour {
 			
 		}
     }
+    #region game logic
     public static void StartRegular()
     {
 		Backend.ShowHideLoad(true);
         singleton.actualGame = regular;
-		Debug.Log ("actual game set");
+		
         SceneManager.LoadScene("Game");
     }
 
@@ -142,9 +162,257 @@ public class GameManager : MonoBehaviour {
 
 	}
 
+    IEnumerator Counter() //számláló
+    {
+        Console.Log("Timer started");
+        time = 0;
+
+        while (true)
+        {
+            timeText.text = (time / 60).ToString("00") + ":" + (time % 60).ToString("00");
+            multiplier = 6 - (Math.Min((time / 60), 5));
+            time++;
+            yield return new WaitForSeconds(1f); //másodpercenként menjen a ciklus
+        }
+    }
 
 
-void StartLocalGame() //játék indítása
+
+    void SetupGrid()
+    {
+
+        Transform parent = GameObject.Find("GRID").transform;
+        for (int i = 0; i < actualGame.n; i++)
+        {
+            for (int j = 0; j < actualGame.n; j++)
+            {
+                GameObject go = Instantiate(fieldPrefab, new Vector3(i + 0.5f, j + 0.5f, 0), Quaternion.identity, parent);
+                Field currentfield = go.GetComponent<Field>();
+
+                field[i, j].fieldClass = currentfield;
+
+
+                currentfield.Setup(field[i, j].value,
+                    i, j,
+                    (field[i, j].value == -1), //akna -e?
+                    textures[field[i, j].value + 1] //textúra.
+                );
+            }
+        }
+
+        parent.position = new Vector3(-actualGame.n / 2, -actualGame.n / 2, 0);
+        Debug.Log("grid setup size: " + actualGame.n);
+        CameraControl.singleton.AlignCamera(actualGame.n);
+
+    }
+
+
+    private void CheckIfZero(int x, int y)
+    {
+        int n = actualGame.n;
+        if (x < 0 || x >= n || y < 0 || y >= n)
+        {
+            return;
+        }
+
+
+        //   if(field[x,y].value == 0 )
+        //   {
+        field[x, y].fieldClass.ClickedMe(true);
+        //  }
+
+
+    }
+
+
+
+
+    public void Clicked(int x, int y)
+    {
+        if (firstClick)
+        {
+            counter = StartCoroutine(Counter());
+            Destroy(References.singleton.StartTip);
+            point = 0;
+            firstClick = false;
+        }
+        //Console.Log("Clicked on " + x + "," + y);
+
+
+        int whatIsIt = field[x, y].value; //(int) mert vector2 floatot tárol..
+
+
+        CalculatePoint(whatIsIt);
+
+        if (whatIsIt == 0)
+        {
+            for (int i = -1; i <= 1; i++)
+            {
+                for (int j = -1; j <= 1; j++)
+                {
+                    CheckIfZero(x + i, y + j);
+                }
+            }
+        }
+
+        IsEnd(x, y, whatIsIt);
+
+    }
+
+    private void CalculatePoint(int actualNumber)
+    {
+        if (actualNumber < 1)
+        {
+            return;
+        }
+        point = point + actualNumber * multiplier;
+        pointText.text = point.ToString();
+        //Debug.Log ("Added point: ["+ (point - actualNumber * multiplier) +" + "+ (actualNumber * multiplier) +"] (actual number: "+actualNumber+" * multiplier: "+multiplier+")");
+
+    }
+
+    private void IsEnd(int x, int y, int actualNumber)
+    {
+        if (actualNumber == -1) // :( (akna)
+        {
+            Loose(x, y);
+            return;
+        }
+        remainingNotMineFields--;
+        if (remainingNotMineFields <= 0)
+        {
+            Victory(x, y);
+        }
+    }
+
+    private void Victory(int x, int y)
+    {
+        PLAYING = false;
+        StartCoroutine(CameraControl.singleton.ResetCamera());
+        StopCoroutine(counter);
+        References.singleton.endGUI.Won();
+
+        if (actualGame.mode == GameMode.REGULAR) StartCoroutine(Backend.singleton.SendScore(point));
+    }
+
+    private void Loose(int x, int y)
+    {
+        PLAYING = false;
+        StartCoroutine(CameraControl.singleton.ResetCamera());
+        StopCoroutine(counter);
+        References.singleton.endGUI.Lost();
+
+        StartCoroutine(FloodAlgorithm(x, y));
+        StartCoroutine(Backend.singleton.SendScore(point));
+
+
+
+    }
+
+    void GenerateMines(int minecount)
+    {
+        minePositions = new List<Vector2>();
+
+
+
+        int size = actualGame.n;
+
+        while (minePositions.Count < minecount)
+        {
+            Vector2 mine = new Vector2(
+                UnityEngine.Random.Range(0, size),
+                UnityEngine.Random.Range(0, size));
+            if (!minePositions.Contains(mine))
+            {
+                minePositions.Add(mine);
+                //Debug.Log(mine.x +" " + mine.y);// pozíciók kiírása
+            }
+        }
+    }
+
+    private void TryToAddOne(int x, int y)
+    {
+        int n = actualGame.n;
+        if (x < 0 || x >= n || y < 0 || y >= n)
+        {
+            return;
+        }
+        if (field[x, y].value == -1)
+        {
+            return;
+        }
+        field[x, y].value++;
+        //Debug.Log ("Adding mine to " + x + " " + y + "!");
+    }
+
+    private void FillMatrix()
+    {
+        foreach (Vector2 mine in minePositions)
+        {
+            field[(int)mine.x, (int)mine.y].value = -1;
+            for (int i = -1; i <= 1; i++)
+            {
+                for (int j = -1; j <= 1; j++)
+                {
+                    TryToAddOne((int)mine.x + i, (int)mine.y + j);
+                }
+            }
+
+            //TryToAddOne ((int)mine.x-1,(int)mine.y-1);
+
+        }
+    }
+
+
+
+
+
+    IEnumerator FloodAlgorithm(int x, int y)
+    {
+        yield return floodWait;
+        try
+        {
+            if (field[x, y].flooded) { yield break; }
+
+            field[x, y].fieldClass.TurnMe();
+            field[x, y].flooded = true;
+        }
+        catch (IndexOutOfRangeException)
+        {
+            yield break;
+        }
+
+        StartCoroutine(FloodAlgorithm(x - 1, y));
+
+        StartCoroutine(FloodAlgorithm(x, y - 1));
+
+
+        StartCoroutine(FloodAlgorithm(x - 1, y - 1));
+
+        StartCoroutine(FloodAlgorithm(x + 1, y));
+
+        StartCoroutine(FloodAlgorithm(x, y + 1));
+
+        StartCoroutine(FloodAlgorithm(x + 1, y + 1));
+
+        StartCoroutine(FloodAlgorithm(x - 1, y + 1));
+
+        StartCoroutine(FloodAlgorithm(x + 1, y - 1));
+
+
+    }
+
+    public void FlagCount(int x)
+    {
+        flaggedCount += x;
+        References.singleton.mines.text = (actualGame.mines - flaggedCount).ToString();
+
+
+    }
+    #endregion
+
+
+    void StartLocalGame() //játék indítása
     {
         flaggedCount = 0;
 		firstClick = true;
@@ -167,244 +435,12 @@ void StartLocalGame() //játék indítása
 
         remainingNotMineFields = actualGame.n * actualGame.n - actualGame.mines;
 		PLAYING = true;
+        MY_TURN = true;
         Backend.ShowHideLoad(false);
 
     }
    
-    IEnumerator Counter() //számláló
-    {
-      Console.Log("Timer started");
-        time = 0;
-     
-        while(true)
-        {
-            timeText.text = (time / 60).ToString("00") + ":" + (time % 60).ToString("00");
-			multiplier = 6-(Math.Min((time / 60),5));
-            time++;
-            yield return new WaitForSeconds(1f); //másodpercenként menjen a ciklus
-        }
-    }
-    
-    
-
-    void SetupGrid()
-    {
-        
-        Transform parent = GameObject.Find("GRID").transform;
-        for(int i = 0; i < actualGame.n;i++)
-        {
-            for(int j = 0; j < actualGame.n;j++)
-            {
-                GameObject go = Instantiate(fieldPrefab, new Vector3(i+0.5f, j+0.5f, 0), Quaternion.identity, parent);
-				Field currentfield = go.GetComponent<Field> ();
-
-                field[i, j].fieldClass = currentfield;
-
-
-                currentfield.Setup(field[i, j].value,
-                    i, j,
-                    (field[i, j].value == -1), //akna -e?
-                    textures[field[i, j].value + 1] //textúra.
-                );
-            }
-        }
-
-        parent.position = new Vector3(-actualGame.n / 2, -actualGame.n / 2, 0);
-		Debug.Log ("grid setup size: " + actualGame.n);
-        CameraControl.singleton.AlignCamera(actualGame.n);
-
-    }
-
-
-    private void CheckIfZero(int x,int y)
-    {
-        int n = actualGame.n;
-        if (x < 0 || x >= n || y < 0 || y >= n)
-        {
-            return;
-        }
-
-
-     //   if(field[x,y].value == 0 )
-     //   {
-            field[x,y].fieldClass.ClickedMe(true);
-      //  }
-
-
-    }
-
-
-
-
-    public void Clicked(int x,int y)
-    {
-		if(firstClick) {
-			counter = StartCoroutine(Counter());
-			Destroy(References.singleton.StartTip);
-			point = 0;
-			firstClick = false;
-		}
-        //Console.Log("Clicked on " + x + "," + y);
-
-
-        int whatIsIt = field[x,y].value; //(int) mert vector2 floatot tárol..
-
-        
-		CalculatePoint (whatIsIt);
-
-        if (whatIsIt == 0)
-        {
-			for (int i = -1; i <= 1; i++) {
-				for (int j = -1; j <= 1; j++) {
-					CheckIfZero(x + i, y + j);
-				}
-			}
-        }
-
-		IsEnd(x,y,whatIsIt);
-
-    }
-
-	private void CalculatePoint(int actualNumber){
-		if(actualNumber<1){
-			return;
-		}
-		point = point + actualNumber * multiplier;
-		pointText.text = point.ToString();
-		//Debug.Log ("Added point: ["+ (point - actualNumber * multiplier) +" + "+ (actualNumber * multiplier) +"] (actual number: "+actualNumber+" * multiplier: "+multiplier+")");
-
-	}
-
-	private void IsEnd(int x, int y, int actualNumber)
-    {
-		if (actualNumber == -1) // :( (akna)
-		{
-			Loose(x, y);
-			return;
-		}
-        remainingNotMineFields--;
-        if (remainingNotMineFields <= 0)
-        {
-            Victory(x, y);
-        }
-    }
-
-    private void Victory(int x, int y)
-    {
-        PLAYING = false;
-        StartCoroutine(CameraControl.singleton.ResetCamera());
-        StopCoroutine(counter);
-        References.singleton.endGUI.Won();
-
-		if(actualGame.mode == GameMode.REGULAR) StartCoroutine (Backend.singleton.SendScore(point));
-    }
-
-    private void Loose(int x, int y)
-    {
-        PLAYING = false;
-        StartCoroutine(CameraControl.singleton.ResetCamera());
-        StopCoroutine(counter);
-        References.singleton.endGUI.Lost();
-
-        StartCoroutine(FloodAlgorithm(x, y));
-		StartCoroutine (Backend.singleton.SendScore(point));
-
-
-
-    }
-
-    void GenerateMines(int minecount){
-		minePositions = new List<Vector2> ();
-
-
-
-		int size = actualGame.n;
-
-		while (minePositions.Count < minecount) {
-			Vector2 mine = new Vector2 (
-				UnityEngine.Random.Range (0, size),
-				UnityEngine.Random.Range (0, size));
-			if(!minePositions.Contains(mine)){
-				minePositions.Add (mine);
-				//Debug.Log(mine.x +" " + mine.y);// pozíciók kiírása
-			}
-		}
-	}
-
-	private void TryToAddOne(int x, int y){
-		int n = actualGame.n;
-		if (x < 0 || x >= n || y < 0 || y >= n) {
-			return;
-		}
-		if(field [x, y].value == -1){
-			return;
-		}
-		field [x, y].value++;
-		//Debug.Log ("Adding mine to " + x + " " + y + "!");
-	}
-
-	private void FillMatrix(){
-		foreach(Vector2 mine in minePositions){
-			field[(int)mine.x, (int)mine.y].value = -1;
-			for (int i = -1; i <= 1; i++) {
-				for (int j = -1; j <= 1; j++) {
-					TryToAddOne ((int)mine.x + i, (int)mine.y + j);
-				}
-			}
-
-			//TryToAddOne ((int)mine.x-1,(int)mine.y-1);
-
-		}
-	}
-
-
-    
-
-
-    IEnumerator FloodAlgorithm(int x, int y)
-    {
-        yield return floodWait;
-        try
-        {
-            if (field[x, y].flooded) { yield break; }
-
-            field[x, y].fieldClass.TurnMe();
-            field[x, y].flooded = true;
-        }
-        catch (IndexOutOfRangeException)
-        {
-            yield break;
-        }
-
-        StartCoroutine(FloodAlgorithm(x - 1, y));
-        
-        StartCoroutine(FloodAlgorithm(x, y - 1));
-
-
-        StartCoroutine(FloodAlgorithm(x - 1, y - 1));
-     
-        StartCoroutine(FloodAlgorithm(x + 1, y));
-
-        StartCoroutine(FloodAlgorithm(x, y + 1));
-     
-        StartCoroutine(FloodAlgorithm(x + 1, y + 1));
-
-        StartCoroutine(FloodAlgorithm(x - 1, y + 1));
-      
-        StartCoroutine(FloodAlgorithm(x + 1, y - 1));
-
-
-    }
-
-    public void FlagCount(int x)
-    {
-        flaggedCount += x;
-        References.singleton.mines.text = (actualGame.mines - flaggedCount).ToString();
-
-
-    }
-
-    void StartMultiplayerGameAsHost() //játék indítása
+    void StartMultiplayerGame(bool server) //játék indítása
     {
 
 
@@ -416,7 +452,7 @@ void StartLocalGame() //játék indítása
         References.singleton.mines.text = actualGame.mines.ToString();
 
         field = new FieldStruct[actualGame.n, actualGame.n];
-        GenerateMines(actualGame.mines);
+       if(server) GenerateMines(actualGame.mines);
         FillMatrix();
 
 
@@ -426,42 +462,74 @@ void StartLocalGame() //játék indítása
         References.singleton.StartTip.SetActive(true);
 
 
-        NetworkServer.SendToAll(100, new IntegerMessage(MsgTypes.SERVER_LOADED));
+        if(server)SendMap();
+        //a szerver legenerálta a mapot,elküldjük a clientnek
+
 
         remainingNotMineFields = actualGame.n * actualGame.n - actualGame.mines; 
-
-
-
 
     }
     public void RegisterHandlers()
     {
         if (NetworkServer.active)
         {
-            NetworkServer.RegisterHandler(100, MessageFromClient);
+            NetworkServer.RegisterHandler(100, IntMessageFromClient);
         }
         else
         {
-            NetworkManager.singleton.client.RegisterHandler(100, MessageFromServer);
+            NetworkManager.singleton.client.RegisterHandler(MessageTypes.INTEGER_MESSAGE, IntMessageFromServer);
+            NetworkManager.singleton.client.RegisterHandler(MessageTypes.MINES_MESSAGE, MinesMessageFromServer);
         }
 
         Console.Log("Registering message handlers");
     }
-    void MessageFromServer(NetworkMessage msg )
+    void IntMessageFromServer(NetworkMessage msg )
     {
         int msgInt = msg.ReadMessage<IntegerMessage>().value;
-        Console.Log("Message from server:" + msgInt);
+        Console.Log("IntMessage from server:" + msgInt);
+       
+    }
+
+    void MinesMessageFromServer(NetworkMessage msg)
+    {
+        minePositions = new List<Vector2>(msg.ReadMessage<MinesMessage>().mines);
+        SceneManager.LoadScene("Game"); //megvan az aknák pozíciója, töltsük be a scenet!
+    }
+    //SZERVER
+    private void SendMap()
+    {
+        MinesMessage msg = new MinesMessage();
+        msg.mines = minePositions.ToArray();
+        NetworkServer.SendToAll(MessageTypes.MINES_MESSAGE, msg);
+    }
+
+    
+    void IntMessageFromClient(NetworkMessage msg)
+    {
+        int msgInt = msg.ReadMessage<IntegerMessage>().value;
         switch(msgInt)
         {
-            case MsgTypes.SERVER_LOADED:
-                Console.Log("Message from server: READY");
-                SceneManager.LoadScene("Game");
+            case IntegerMessages.CLIENT_READY:
+                Console.Log("Message from " + msg.conn.address + ": READY");
+                //a kliens betöltődött, indulhat a játék
+
+
+                Backend.ShowHideLoad(false);
+                MyTurn();
+                
                 break;
         }
     }
- 
-    void MessageFromClient(NetworkMessage msg)
-    {
 
+
+    void MyTurn()
+    {
+        MY_TURN = true;
+        References.singleton.gameBackground.material.color = Color.green;
+    }
+    void NotMyTurn()
+    {
+        MY_TURN = false;
+        References.singleton.gameBackground.material.color = Color.red;
     }
 }

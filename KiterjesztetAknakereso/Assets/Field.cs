@@ -48,6 +48,7 @@ public class Field : MonoBehaviour {
 	public void ClickedMe(bool logic)
 	/* logic -- az algoritmus fordtotta-e át a fieldet (pl 0 szomszédja..) */
     {
+        if (!GameManager.MY_TURN) return;
         if (alreadyClicked) return;
 		if(flagged) {
 			FlagMe ();

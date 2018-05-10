@@ -291,7 +291,7 @@ public class CameraControl : MonoBehaviour {
 
     public void AlignCamera(int n)
     {
-        Console.Log("Align camera: " + n);
+     
         mapSize = n;
         transform.GetChild(0).localScale *= n;
         cam.orthographicSize =n;
