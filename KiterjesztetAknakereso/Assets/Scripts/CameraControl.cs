@@ -158,7 +158,7 @@ public class CameraControl : MonoBehaviour {
     {
         if (!GameManager.PLAYING) 
             return;
-        Debug.Log("update");
+
        if(Input.GetMouseButtonUp(0))
             /*ezt ide kell raknom, az IsPointerOver... elé, mert különben ha mozgok, 
              * és az egeret az átlátszó zoomslider felett engedem fel, akkor nem kapcsol vissza, hiszen ignorálva lesz az egész update..
@@ -249,7 +249,9 @@ public class CameraControl : MonoBehaviour {
 				if (_long) {
 					hit.collider.gameObject.GetComponent<Field> ().FlagMe ();
 				} else {
-					hit.collider.gameObject.GetComponent<Field> ().ClickedMe (false);
+                  
+                        hit.collider.gameObject.GetComponent<Field>().ClickedMe(false);
+                 
 				}
             }
         }

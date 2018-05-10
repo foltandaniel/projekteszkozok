@@ -58,8 +58,9 @@ class MinesMessage : MessageBase
   
 }
 public class GameManager : MonoBehaviour {
-	
-	public static bool PLAYING,MY_TURN;
+    public static Color myTurnColor = new Color(0f,1f,0f,1f);
+    public static Color notMyTurnColor = new Color(0f, 1f, 0f, 0.3f);
+    public static bool PLAYING,MY_TURN;
 	private bool firstClick;
     public static GameManager singleton;
     public static Game regular = new Game("Regular", 15, 45, GameMode.REGULAR, false);
@@ -136,6 +137,7 @@ public class GameManager : MonoBehaviour {
                     //szervernek küldünk infót, hogy kész vagyunk.
 
                     NotMyTurn();
+                    PLAYING = true;
                     Backend.ShowHideLoad(false);
                 }
             }
@@ -232,7 +234,7 @@ public class GameManager : MonoBehaviour {
         if (firstClick)
         {
             counter = StartCoroutine(Counter());
-            Destroy(References.singleton.StartTip);
+          
             point = 0;
             firstClick = false;
         }
@@ -443,7 +445,7 @@ public class GameManager : MonoBehaviour {
     void StartMultiplayerGame(bool server) //játék indítása
     {
 
-
+        Destroy(References.singleton.StartTip);
         flaggedCount = 0;
         firstClick = true;
         Console.Log("game mode: " + actualGame);
@@ -516,7 +518,7 @@ public class GameManager : MonoBehaviour {
 
                 Backend.ShowHideLoad(false);
                 MyTurn();
-                
+                PLAYING = true;
                 break;
         }
     }
@@ -525,11 +527,11 @@ public class GameManager : MonoBehaviour {
     void MyTurn()
     {
         MY_TURN = true;
-        References.singleton.gameBackground.material.color = Color.green;
+        References.singleton.gameBackground.material.color = myTurnColor;
     }
     void NotMyTurn()
     {
         MY_TURN = false;
-        References.singleton.gameBackground.material.color = Color.red;
+        References.singleton.gameBackground.material.color = notMyTurnColor;
     }
 }

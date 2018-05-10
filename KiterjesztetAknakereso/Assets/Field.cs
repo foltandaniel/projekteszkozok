@@ -48,7 +48,7 @@ public class Field : MonoBehaviour {
 	public void ClickedMe(bool logic)
 	/* logic -- az algoritmus fordtotta-e át a fieldet (pl 0 szomszédja..) */
     {
-        if (!GameManager.MY_TURN) return;
+       
         if (alreadyClicked) return;
 		if(flagged) {
 			FlagMe ();
@@ -58,9 +58,12 @@ public class Field : MonoBehaviour {
 
 			if (!logic) return; //ha kézzel kattintottunk rá, és flaggelve van, akkor ne forduljon át 
 		}
-        TurnMe();
-        alreadyClicked = true;
-        GameManager.singleton.Clicked(x,y);
+        if (GameManager.MY_TURN)
+        {
+            TurnMe();
+            alreadyClicked = true;
+            GameManager.singleton.Clicked(x, y);
+        }
     
 
 
