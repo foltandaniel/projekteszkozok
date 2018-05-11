@@ -11,7 +11,10 @@ public enum GameMode
 {
     CUSTOM,REGULAR
 }
-
+public enum GameStatus
+{
+    MY_TURN,OPPONENT_TURN,ENDED,NOT_STARTED
+}
 public struct Game {
     public string name;
     public int n;
@@ -58,9 +61,13 @@ class MinesMessage : MessageBase
   
 }
 public class GameManager : MonoBehaviour {
-    public static Color myTurnColor = new Color(0f,1f,0f,1f);
-    public static Color notMyTurnColor = new Color(0f, 1f, 0f, 0.3f);
-    public static bool PLAYING,MY_TURN;
+
+    private static GameStatus gameStat = GameStatus.NOT_STARTED; 
+    static Color myTurnColor = new Color(1f,1f,1f,1f);
+    static Color notMyTurnColor = new Color(0f, 1f, 0f, 1f);
+
+
+
 	private bool firstClick;
     public static GameManager singleton;
     public static Game regular = new Game("Regular", 15, 45, GameMode.REGULAR, false);
@@ -99,6 +106,15 @@ public class GameManager : MonoBehaviour {
     Coroutine counter; //referencia a számláló funkcióra, hogy megtudjuk állítani
     private WaitForSeconds floodWait = new WaitForSeconds(0.17f);
     int time;
+
+    public static GameStatus GameStat
+    {
+        get
+        {
+            return gameStat;
+        }
+    }
+
     void Awake()
     {
     
@@ -119,36 +135,45 @@ public class GameManager : MonoBehaviour {
     private void SceneChanged(Scene from, Scene to)
     {
         Console.Log("SCENE CHANGE: "+ from.name + "->" + to.name);
-		if (to.name == "Game") {
-            PLAYING = false;
+		if (to.name == "SinglePlayerScene") {
+       
             StopAllCoroutines ();
             Dialog.Hide();
 			timeText = References.singleton.timeText;
-			pointText = References.singleton.pointText;
-            if (actualGame.multiplayer) {
+			pointText = References.singleton.pointOrWhoText;
+          
+                StartLocalGame();
+		} else if(to.name == "MultiPlayerScene")
+        {
+            if (actualGame.multiplayer)
+            {
 
-                if (NetworkServer.active){ // mi vagyunk a szerver..
-                   
+                if (NetworkServer.active)
+                { // mi vagyunk a szerver..
+
                     StartMultiplayerGame(true);
-                } else
+                }
+                else
                 {
                     StartMultiplayerGame(false); // elindítjuk a gamet, de aknákat NEM kell generálni
                     NetworkManager.singleton.client.Send(MessageTypes.INTEGER_MESSAGE, new IntegerMessage(IntegerMessages.CLIENT_READY));
                     //szervernek küldünk infót, hogy kész vagyunk.
 
                     NotMyTurn();
-                    PLAYING = true;
                     Backend.ShowHideLoad(false);
+                    Dialog.Hide();
                 }
             }
-            else
-            {
-                StartLocalGame();
-            }
-			
-		}
+        }
+
+
+        else
+        {
+            gameStat = GameStatus.NOT_STARTED;
+        }
     }
-    #region game logic
+
+    #region common game logic
     public static void StartRegular()
     {
 		Backend.ShowHideLoad(true);
@@ -164,9 +189,9 @@ public class GameManager : MonoBehaviour {
 
 	}
 
-    IEnumerator Counter() //számláló
+    IEnumerator SinglePlayerCounter() //számláló
     {
-        Console.Log("Timer started");
+       
         time = 0;
 
         while (true)
@@ -177,7 +202,18 @@ public class GameManager : MonoBehaviour {
             yield return new WaitForSeconds(1f); //másodpercenként menjen a ciklus
         }
     }
+    IEnumerator MultiPlayerCounter() //számláló
+    {
 
+        time = 30;
+
+        while (true)
+        {
+            timeText.text = "00:" +time.ToString("00");
+            time--;
+            yield return new WaitForSeconds(1f); //másodpercenként menjen a ciklus
+        }
+    }
 
 
     void SetupGrid()
@@ -220,7 +256,7 @@ public class GameManager : MonoBehaviour {
 
         //   if(field[x,y].value == 0 )
         //   {
-        field[x, y].fieldClass.ClickedMe(true);
+        field[x, y].fieldClass.TurnMe();
         //  }
 
 
@@ -231,34 +267,47 @@ public class GameManager : MonoBehaviour {
 
     public void Clicked(int x, int y)
     {
-        if (firstClick)
+        Field clickedField = field[x, y].fieldClass;
+
+        if(clickedField.IsFlagged())
         {
-            counter = StartCoroutine(Counter());
-          
+            clickedField.FlagMe(); //ha flagelve van, akkor csak unflag, semmi más
+            return;
+        }
+        //NINCS FLAGELVE
+
+        if (gameStat != GameStatus.MY_TURN) return; //nem mi jövünk.
+
+        if (!actualGame.multiplayer &&firstClick)
+            //nem multi, indulhat a time.
+        {
+            counter = StartCoroutine(SinglePlayerCounter());
             point = 0;
             firstClick = false;
+
+            Destroy(References.singleton.StartTip);
         }
-        //Console.Log("Clicked on " + x + "," + y);
+
+       clickedField.TurnMe(); 
+        
+       int whatIsIt = field[x, y].value;
 
 
-        int whatIsIt = field[x, y].value; //(int) mert vector2 floatot tárol..
+            if(!actualGame.multiplayer)CalculatePoint(whatIsIt);
 
-
-        CalculatePoint(whatIsIt);
-
-        if (whatIsIt == 0)
-        {
-            for (int i = -1; i <= 1; i++)
+            if (whatIsIt == 0)
             {
-                for (int j = -1; j <= 1; j++)
+                for (int i = -1; i <= 1; i++)
                 {
-                    CheckIfZero(x + i, y + j);
+                    for (int j = -1; j <= 1; j++)
+                    {
+                        CheckIfZero(x + i, y + j);
+                    }
                 }
             }
-        }
 
-        IsEnd(x, y, whatIsIt);
-
+            IsEnd(x, y, whatIsIt);
+        
     }
 
     private void CalculatePoint(int actualNumber)
@@ -289,7 +338,7 @@ public class GameManager : MonoBehaviour {
 
     private void Victory(int x, int y)
     {
-        PLAYING = false;
+        gameStat = GameStatus.ENDED;
         StartCoroutine(CameraControl.singleton.ResetCamera());
         StopCoroutine(counter);
         References.singleton.endGUI.Won();
@@ -299,7 +348,7 @@ public class GameManager : MonoBehaviour {
 
     private void Loose(int x, int y)
     {
-        PLAYING = false;
+        gameStat = GameStatus.ENDED;
         StartCoroutine(CameraControl.singleton.ResetCamera());
         StopCoroutine(counter);
         References.singleton.endGUI.Lost();
@@ -413,8 +462,7 @@ public class GameManager : MonoBehaviour {
     }
     #endregion
 
-
-    void StartLocalGame() //játék indítása
+    void StartLocalGame() //egyszemélyes játék indítása
     {
         flaggedCount = 0;
 		firstClick = true;
@@ -426,9 +474,6 @@ public class GameManager : MonoBehaviour {
 		field = new FieldStruct[actualGame.n, actualGame.n];
 		GenerateMines (actualGame.mines);
 		FillMatrix ();
-
-       
-       // actualGame = regular;
         SetupGrid();
 
 		References.singleton.StartTip.SetActive (true);
@@ -436,16 +481,15 @@ public class GameManager : MonoBehaviour {
 
 
         remainingNotMineFields = actualGame.n * actualGame.n - actualGame.mines;
-		PLAYING = true;
-        MY_TURN = true;
+        gameStat = GameStatus.MY_TURN;
         Backend.ShowHideLoad(false);
 
     }
    
-    void StartMultiplayerGame(bool server) //játék indítása
+    void StartMultiplayerGame(bool server) //multiplayer játék indítása
     {
 
-        Destroy(References.singleton.StartTip);
+        Destroy(References.singleton.StartTip); //nem kell startTip..
         flaggedCount = 0;
         firstClick = true;
         Console.Log("game mode: " + actualGame);
@@ -454,60 +498,64 @@ public class GameManager : MonoBehaviour {
         References.singleton.mines.text = actualGame.mines.ToString();
 
         field = new FieldStruct[actualGame.n, actualGame.n];
-       if(server) GenerateMines(actualGame.mines);
-        FillMatrix();
+       if(server) GenerateMines(actualGame.mines); 
+       //mi vagyunk a szerver, szóval generáljuk az aknákat
+
+        FillMatrix(); //feltöltjük a mapot
+
+        SetupGrid(); //létrehozzuk a konkrét GameObjecteket
+
+        remainingNotMineFields = actualGame.n * actualGame.n - actualGame.mines;
 
 
-        // actualGame = regular;
-        SetupGrid();
 
-        References.singleton.StartTip.SetActive(true);
-
-
-        if(server)SendMap();
+        if (server) SendMap();
         //a szerver legenerálta a mapot,elküldjük a clientnek
 
 
-        remainingNotMineFields = actualGame.n * actualGame.n - actualGame.mines; 
-
     }
     public void RegisterHandlers()
+        //üzenet handlerek regisztrálása
     {
         if (NetworkServer.active)
         {
-            NetworkServer.RegisterHandler(100, IntMessageFromClient);
+            NetworkServer.RegisterHandler(100, IntMessageFromClient); //szerver IntMessage handlere
         }
         else
         {
             NetworkManager.singleton.client.RegisterHandler(MessageTypes.INTEGER_MESSAGE, IntMessageFromServer);
             NetworkManager.singleton.client.RegisterHandler(MessageTypes.MINES_MESSAGE, MinesMessageFromServer);
+            //kliens IntMessage és MinesMessage handlere
         }
 
         Console.Log("Registering message handlers");
     }
-    void IntMessageFromServer(NetworkMessage msg )
-    {
-        int msgInt = msg.ReadMessage<IntegerMessage>().value;
-        Console.Log("IntMessage from server:" + msgInt);
-       
-    }
 
-    void MinesMessageFromServer(NetworkMessage msg)
-    {
-        minePositions = new List<Vector2>(msg.ReadMessage<MinesMessage>().mines);
-        SceneManager.LoadScene("Game"); //megvan az aknák pozíciója, töltsük be a scenet!
-    }
     //SZERVER
     private void SendMap()
     {
         MinesMessage msg = new MinesMessage();
         msg.mines = minePositions.ToArray();
-        NetworkServer.SendToAll(MessageTypes.MINES_MESSAGE, msg);
+        //MineMessage létrehozása.. belerakjuk az aknákat
+        //paraméteres típusokat NEM lehet küldeni, ezért átalakítjuk tömbbé
+        NetworkServer.SendToAll(MessageTypes.MINES_MESSAGE, msg); //küldés
     }
 
-    
+    void IntMessageFromServer(NetworkMessage msg)
+    {
+        int msgInt = msg.ReadMessage<IntegerMessage>().value;
+        Console.Log("IntMessage from server:" + msgInt);
+        //szervertől jött egy IntMessage
+    }
+
+    void MinesMessageFromServer(NetworkMessage msg)
+    {
+        minePositions = new List<Vector2>(msg.ReadMessage<MinesMessage>().mines);
+        SceneManager.LoadScene("MultiPlayerScene"); //megvan az aknák pozíciója, töltsük be a scenet!
+    }
     void IntMessageFromClient(NetworkMessage msg)
     {
+        //klienstől jött IntMessage
         int msgInt = msg.ReadMessage<IntegerMessage>().value;
         switch(msgInt)
         {
@@ -517,8 +565,8 @@ public class GameManager : MonoBehaviour {
 
 
                 Backend.ShowHideLoad(false);
-                MyTurn();
-                PLAYING = true;
+                Dialog.Hide();
+                MyTurn(); //én (szerver) kezd
                 break;
         }
     }
@@ -526,12 +574,20 @@ public class GameManager : MonoBehaviour {
 
     void MyTurn()
     {
-        MY_TURN = true;
-        References.singleton.gameBackground.material.color = myTurnColor;
+        StopCoroutine(counter);
+        counter = StartCoroutine(MultiPlayerCounter());
+
+        gameStat = GameStatus.MY_TURN;
+        References.singleton.gameBackground.sharedMaterial.color = myTurnColor;
+        References.singleton.pointOrWhoText.text = "<color=green>Your turn!</color>";
     }
     void NotMyTurn()
     {
-        MY_TURN = false;
-        References.singleton.gameBackground.material.color = notMyTurnColor;
+        StopCoroutine(counter);
+        counter = StartCoroutine(MultiPlayerCounter());
+
+        gameStat = GameStatus.OPPONENT_TURN;
+        References.singleton.gameBackground.sharedMaterial.color = notMyTurnColor;
+        References.singleton.pointOrWhoText.text = "<color=red>Opponent turn!</color>";
     }
 }

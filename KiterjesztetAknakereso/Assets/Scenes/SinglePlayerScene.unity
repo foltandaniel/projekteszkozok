@@ -2961,7 +2961,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timeText: {fileID: 2110879332}
-  pointText: {fileID: 926465610}
+  pointOrWhoText: {fileID: 926465610}
   gameBackground: {fileID: 140442105}
   mines: {fileID: 109314080}
   endGUI: {fileID: 1558210581}

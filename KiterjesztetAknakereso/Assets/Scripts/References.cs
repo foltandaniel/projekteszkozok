@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 public class References : MonoBehaviour {
-    public Text timeText,pointText;
+    public Text timeText,pointOrWhoText;
 
     public Renderer gameBackground;
     public Text mines;

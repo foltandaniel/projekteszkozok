@@ -156,7 +156,8 @@ public class CameraControl : MonoBehaviour {
     //WINDOWS UPDATE
     void Update()
     {
-        if (!GameManager.PLAYING) 
+        if (GameManager.GameStat == GameStatus.NOT_STARTED ||
+            GameManager.GameStat == GameStatus.ENDED) 
             return;
 
        if(Input.GetMouseButtonUp(0))
@@ -249,8 +250,12 @@ public class CameraControl : MonoBehaviour {
 				if (_long) {
 					hit.collider.gameObject.GetComponent<Field> ().FlagMe ();
 				} else {
-                  
-                        hit.collider.gameObject.GetComponent<Field>().ClickedMe(false);
+
+                    // hit.collider.gameObject.GetComponent<Field>().ClickedMe(false);
+                    /* Előbb a GameManagernek szólunk, majd ő elintézi a többit */
+
+                    Field clickedField = hit.collider.gameObject.GetComponent<Field>();
+                    GameManager.singleton.Clicked(clickedField.X,clickedField.Y);
                  
 				}
             }

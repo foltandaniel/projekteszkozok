@@ -6,11 +6,11 @@ using UnityEngine.SceneManagement;
 
 public class GameNetworkManager : NetworkManager {
 
-    public static GameNetworkManager G_singleton;
+    public static GameNetworkManager singleton;
 
    void Awake()
     {
-        G_singleton = this;
+        singleton = this;
     }
     	public static void CreateGame()
     {
@@ -33,7 +33,7 @@ public class GameNetworkManager : NetworkManager {
            // Backend.ShowHideLoad(true);
             Console.Log("Client connected: " + connection.address);
             GameManager.singleton.actualGame = new Game("Multiplayer", 15, 45, GameMode.CUSTOM, true);
-            SceneManager.LoadScene("Game");
+            SceneManager.LoadScene("MultiPlayerScene");
         }
     }
 
@@ -46,7 +46,7 @@ public class GameNetworkManager : NetworkManager {
         GameManager.singleton.actualGame = new Game("Multiplayer", 15, 45, GameMode.CUSTOM, true);
 
         Console.Log("Waiting for server to load..");
-      //  SceneManager.LoadScene("Game");
+
     }
 
 }

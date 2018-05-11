@@ -66,7 +66,7 @@ public class MultiplayerUI : MonoBehaviour {
 
 
             StopEverything();
-            GameNetworkManager.G_singleton.TryToConnect(fromAddress);
+            GameNetworkManager.singleton.TryToConnect(fromAddress);
 
 
         }));

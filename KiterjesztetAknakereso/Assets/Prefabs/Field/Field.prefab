@@ -345,6 +345,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   front: {fileID: 23434307618840070}
   back: {fileID: 23412137977060790}
+  myCollider: {fileID: 61600268939920748}
   text: {fileID: 102193375879266496}
 --- !u!224 &224588368150098522
 RectTransform:
