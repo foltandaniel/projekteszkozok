@@ -51,7 +51,7 @@ public class CustomGameStarter : MonoBehaviour {
 		}catch(Exception e) {
 			Console.Log ("Exception in CustomGameStarter: " + e);
 			Toast.Show ("Invalid parameter!");
-			ChangeMapSize (GameManager.regular.n);
+			ChangeMapSize (GlobalGameManager.regular.n);
 			return;
 		}
 		FixPlayerMistakes ();
@@ -63,7 +63,7 @@ public class CustomGameStarter : MonoBehaviour {
 		}catch(Exception e) {
 			Console.Log ("Exception in CustomGameStarter: " + e);
 			Toast.Show ("Invalid parameter!");
-			mine.text = GameManager.regular.mines.ToString();
+			mine.text = GlobalGameManager.regular.mines.ToString();
 			return;
 		}
 		FixPlayerMistakes ();
@@ -139,7 +139,7 @@ public class CustomGameStarter : MonoBehaviour {
 	public void Play_Button() {
 		FixPlayerMistakes ();
 		Game game = new Game ("Custom Game", mapSize, numberOfMines, GameMode.CUSTOM, false);
-		GameManager.StartCustom (game);
+		GlobalGameManager.StartCustom (game);
 	}
 
 }

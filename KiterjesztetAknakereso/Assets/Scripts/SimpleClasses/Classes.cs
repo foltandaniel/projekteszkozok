@@ -5,8 +5,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace Assets.Scripts.SimpleClasses
-{
+
     public struct Game
     {
         public string name;
@@ -54,4 +53,3 @@ namespace Assets.Scripts.SimpleClasses
         public Vector2[] mines;
 
     }
-}

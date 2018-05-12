@@ -34,7 +34,7 @@ public class EndGameGUI : MonoBehaviour {
     }
     public void PlayAgain()
     {
-        SceneManager.LoadScene("Game");
+        SceneManager.LoadScene("SinglePlayerScene");
     }
 
     

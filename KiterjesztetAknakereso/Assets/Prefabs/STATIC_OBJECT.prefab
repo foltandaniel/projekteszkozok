@@ -922,7 +922,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1689888649384608}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.10489255, y: 4.4149566, z: 0}
+  m_LocalPosition: {x: 214.65445, y: 285.863, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 224602890096416830}
@@ -1144,7 +1144,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 224516785291536228}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.9999998
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1507,10 +1507,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8409d5926954daa4a9f838ebe2d6748b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  multiplayerManagerPrefab: {fileID: 1132774872784258, guid: 102738a3906d0284c89eebfe2c87755d,
+    type: 2}
+  singleplayerManagerPrefab: {fileID: 1957697648255924, guid: 65aa2c2237caad94dbfb8d678a80fc27,
+    type: 2}
+  actualGameManager: {fileID: 0}
   fieldPrefab: {fileID: 1863952729584766, guid: edb8a11bc40a92b4bba2f3736fa46301,
     type: 2}
-  timeText: {fileID: 0}
-  pointText: {fileID: 0}
   textures:
   - {fileID: 2800000, guid: e761d33666f76cb45a6826d49b8f6725, type: 3}
   - {fileID: 2800000, guid: 0a701cb00d1d9604a81e4823708a7a07, type: 3}
@@ -2423,7 +2426,9 @@ MonoBehaviour:
   m_PlayerSpawnMethod: 0
   m_OfflineScene: 
   m_OnlineScene: 
-  m_SpawnPrefabs: []
+  m_SpawnPrefabs:
+  - {fileID: 1132774872784258, guid: 102738a3906d0284c89eebfe2c87755d, type: 2}
+  - {fileID: 1867741132235758, guid: bf3cd6676d184d64db2a6dcd66b420a5, type: 2}
   m_CustomConfig: 0
   m_MaxConnections: 4
   m_ConnectionConfig:
@@ -2476,7 +2481,7 @@ MonoBehaviour:
   m_MatchHost: mm.unet.unity3d.com
   m_MatchPort: 443
   matchName: default
-  matchSize: 4
+  matchSize: 2
   isNetworkActive: 0
   matchMaker: {fileID: 0}
 --- !u!114 &114734370688057814

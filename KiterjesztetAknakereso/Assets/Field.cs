@@ -6,7 +6,7 @@ using UnityEngine;
 public class Field : MonoBehaviour {
 
     private int x,y;
-    bool alreadyClicked,amIMine,flagged;
+    public bool alreadyClicked,amIMine,flagged;
 
 
     //refs
@@ -81,13 +81,13 @@ public class Field : MonoBehaviour {
     }
 
 	private void Unflag(){
-		GameManager.singleton.FlagCount(-1);
+		GlobalGameManager.singleton.actualGameManager.FlagCount(-1);
 		back.material.color = Color.white;
 		flagged = false;
 	}
 
 	private void DoFlag(){
-		GameManager.singleton.FlagCount(+1);
+		GlobalGameManager.singleton.actualGameManager.FlagCount(+1);
 		back.material.color = Color.red;
 		flagged = true;
 	}

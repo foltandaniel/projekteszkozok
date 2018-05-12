@@ -46,7 +46,7 @@ GraphicsSettings:
   m_DefaultRenderingPath: 1
   m_DefaultMobileRenderingPath: 1
   m_TierSettings:
-  - serializedVersion: 4
+  - serializedVersion: 5
     m_BuildTarget: 7
     m_Tier: 0
     m_Settings:
@@ -59,6 +59,7 @@ GraphicsSettings:
       useHDR: 0
       useDetailNormalMap: 0
       useCascadedShadowMaps: 0
+      prefer32BitShadowMaps: 0
       enableLPPV: 0
       useDitherMaskForAlphaBlendedShadows: 0
     m_Automatic: 0

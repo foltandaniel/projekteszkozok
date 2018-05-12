@@ -6857,7 +6857,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.000014315773}
+  m_AnchoredPosition: {x: 0, y: -0.000031175852}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1705571083
@@ -7508,7 +7508,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 42
   m_TargetDisplay: 0
 --- !u!224 &1848978329
 RectTransform:
@@ -7543,7 +7543,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f09d5f98b7473024bacf38831a98783d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  matchesFound: {fileID: 2001958633}
+  matchesFoundText: {fileID: 2001958633}
   listMenu: {fileID: 114049994}
   contentParent: {fileID: 1098554800}
   joinButtonPrefab: {fileID: 1962918064605570, guid: 25581daeec7d1394fb199d4f60e34ee3,
