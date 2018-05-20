@@ -137,16 +137,16 @@ public class SinglePlayerGameManager : NetworkBehaviour {
         IsEnd(x, y, whatIsIt);
     }
 
-    protected void Victory(int x, int y)
+    public virtual void Victory(int x, int y)
     {
       
         StartCoroutine(CameraControl.singleton.ResetCamera());
         StopCoroutine(counter);
         References.singleton.endGUI.Won();
 
-        if (actualGame.mode == GameMode.REGULAR) StartCoroutine(Backend.singleton.SendScore(point));
+        if (actualGame.mode == GameMode.REGULAR && !actualGame.multiplayer) StartCoroutine(Backend.singleton.SendScore(point));
     }
-    protected void Loose(int x, int y)
+    public virtual void Loose(int x, int y)
     {
 
         StartCoroutine(CameraControl.singleton.ResetCamera());
@@ -296,7 +296,7 @@ public class SinglePlayerGameManager : NetworkBehaviour {
     }
 
 
-    protected void IsEnd(int x, int y, int actualNumber)
+    protected virtual void IsEnd(int x, int y, int actualNumber)
     {
         if (actualNumber == -1) // :( (akna)
         {

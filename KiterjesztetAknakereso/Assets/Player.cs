@@ -108,7 +108,18 @@ public class Player : NetworkBehaviour {
     {
         if(GetManager().whosTurn == PLAYER_ID) GetManager().Clicked(x, y);
     }
- 
-  
-   
+    [ClientRpc]
+    public void RpcWin(int x, int y) {
+        if(isLocalPlayer) GetManager().Victory(x,y);
+    }
+    [ClientRpc]
+    public void RpcLost(int x, int y) {
+        if (isLocalPlayer) {
+            GetManager().Victory(x, y);
+        } else {
+            GetManager().Loose(x, y);
+        }
+    }
+
+
 }

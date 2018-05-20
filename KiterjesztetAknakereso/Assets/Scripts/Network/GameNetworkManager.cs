@@ -50,6 +50,7 @@ public class GameNetworkManager : NetworkManager {
         //menüre váltunk, töröljük a game managert
     {
         base.OnClientDisconnect(conn);
+        Toast.Show("Lost connection to the server!");
         GlobalGameManager.singleton.Reset();
 
     }

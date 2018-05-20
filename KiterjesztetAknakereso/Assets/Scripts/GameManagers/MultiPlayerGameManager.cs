@@ -69,8 +69,8 @@ public class MultiPlayerGameManager : SinglePlayerGameManager
     public override void Clicked(int x, int y) //SZERVER
     {
         //jött egy klikk a jelenlegi playertől.
+        
         RpcClicked(x, y); //elküldjük a klienseknek
-
         SwitchPlayers();
     }
 
@@ -125,8 +125,25 @@ public class MultiPlayerGameManager : SinglePlayerGameManager
                 }
             }
         }
+        if (isServer) IsEnd(x, y, whatIsIt);
+    }
+    protected override void IsEnd(int x, int y, int actualNumber) {
+        if (actualNumber == -1) // :( (akna)
+        {
+            LooseServer(x, y);
+            return;
+        }
+        remainingNotMineFields--;
+        if (remainingNotMineFields <= 0) {
+            VictoryServer(x, y);
+        }
+    }
+    private void VictoryServer(int x, int y) {
+        players[whosTurn].RpcWin(x,y);
+    }
+    private void LooseServer(int x, int y) {
 
-        IsEnd(x, y, whatIsIt);
+        players[whosTurn].RpcLost(x,y);
     }
 }
 

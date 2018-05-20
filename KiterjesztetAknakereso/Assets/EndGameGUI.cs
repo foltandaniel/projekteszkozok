@@ -30,6 +30,8 @@ public class EndGameGUI : MonoBehaviour {
 
     public void BackToMenu()
     {
+       // GameNetworkManager.singleton.StopServer();
+        GameNetworkManager.singleton.StopClient();
         SceneManager.LoadScene("Menu");
     }
     public void PlayAgain()

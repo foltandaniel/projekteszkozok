@@ -45,7 +45,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1418414202563346
 GameObject:
   m_ObjectHideFlags: 0
@@ -343,6 +343,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81feb6e90dc917746988f0029c39fa68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  alreadyClicked: 0
+  amIMine: 0
+  flagged: 0
   front: {fileID: 23434307618840070}
   back: {fileID: 23412137977060790}
   myCollider: {fileID: 61600268939920748}

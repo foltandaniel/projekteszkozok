@@ -42,6 +42,7 @@ public class GameDiscovery : NetworkDiscovery {
 
     public void StartBroadcasting()
     {
+        broadcastData = Login.playerName;
         Console.Log("Network: Started broadcasting");
         StopBroadcast();
         Initialize();
