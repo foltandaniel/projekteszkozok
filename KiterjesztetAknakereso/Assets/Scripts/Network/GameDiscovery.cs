@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
- 
+using UnityEngine.SceneManagement;
+
 public class GameDiscovery : NetworkDiscovery {
     public static GameDiscovery singleton;
 
@@ -20,13 +21,28 @@ public class GameDiscovery : NetworkDiscovery {
     }
     void Start()
     {
-        broadcastData =Login.playerName;
-       
+        broadcastData = Login.playerName;
+
         ui = GameObject.FindObjectOfType<MultiplayerUI>();
         NetworkTransport.Init();
+        SceneManager.activeSceneChanged += SceneManager_activeSceneChanged;
+       
     }
-	public void StartBroadcasting()
+
+    private void SceneManager_activeSceneChanged(Scene arg0, Scene arg1)
     {
+        if(arg1.name == "Menu")
+        {
+            broadcastData = Login.playerName;
+
+            ui = GameObject.FindObjectOfType<MultiplayerUI>();
+            NetworkTransport.Init();
+        }
+    }
+
+    public void StartBroadcasting()
+    {
+        broadcastData = Login.playerName;
         Console.Log("Network: Started broadcasting");
         StopBroadcast();
         Initialize();

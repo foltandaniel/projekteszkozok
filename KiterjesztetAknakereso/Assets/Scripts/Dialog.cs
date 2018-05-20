@@ -45,6 +45,10 @@ public class Dialog : MonoBehaviour {
         singleton.AddEventsToButtons(null, cancel);
         singleton.cancel.gameObject.SetActive(true);
     }
+    public static void Hide()
+    {
+        singleton.dialog.SetActive(false);
+    }
     private void AddEventsToButtons(UnityAction yes,UnityAction no)
     {
         /* eventek hozzáadása */

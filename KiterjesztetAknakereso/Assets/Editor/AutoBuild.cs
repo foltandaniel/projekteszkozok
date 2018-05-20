@@ -10,7 +10,7 @@ namespace Auto
         }
         static void PerformBuild()
         {
-			string[] scenes = { "Assets/Scenes/Menu.unity","Assets/Scenes/Game.unity" };
+			string[] scenes = { "Assets/Scenes/Menu.unity","Assets/Scenes/SinglePlayerScene.unity", "Assets/Scenes/MultiPlayerScene.unity" };
 
 			EditorPrefs.SetString("AndroidSdkRoot", "/home/tools/");
 			EditorPrefs.SetString("JdkPath", "/usr/lib/jvm/java-8-oracle");

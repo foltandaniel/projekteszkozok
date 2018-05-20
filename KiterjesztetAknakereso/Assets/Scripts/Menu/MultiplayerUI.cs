@@ -6,8 +6,7 @@ using UnityEngine.UI;
 
 
 public class MultiplayerUI : MonoBehaviour {
-	[SerializeField]
-	public Text matchesFound;
+	public Text matchesFoundText;
 
 
 	#region list
@@ -19,7 +18,7 @@ public class MultiplayerUI : MonoBehaviour {
 
 	private List<string> lobbys = new List<string>(); //tároljuk a szobákat
 	public void Init() {
-
+      
 		
         GameDiscovery.singleton.StartListening();
 		lobbys.Clear ();
@@ -29,7 +28,7 @@ public class MultiplayerUI : MonoBehaviour {
 	}
     private void ClearList()
     {
-        matchesFound.text = "Matches found on your network: 0";
+        matchesFoundText.text = "Matches found on your network: 0";
         foreach(Transform go in contentParent)
         {
             Destroy(go.gameObject);
@@ -38,7 +37,7 @@ public class MultiplayerUI : MonoBehaviour {
 	public void StartGame() {
 		
         GameDiscovery.singleton.StartBroadcasting();
-       // GameNetworkManager.CreateGame();
+        GameNetworkManager.CreateGame();
         Dialog.Info("Waiting for opponent..", new UnityEngine.Events.UnityAction(delegate
          {
              GameDiscovery.singleton.Stop();
@@ -46,7 +45,8 @@ public class MultiplayerUI : MonoBehaviour {
          }));
 	}
 	private void UpdateFoundMatchesText() {
-		matchesFound.text = "Matches found on your network: " + lobbys.Count;
+        Console.Log("Update matches found");
+	matchesFoundText.text = "Matches found on your network: " + lobbys.Count;
 	}
 
 	public void AddToScrollList(string fromAddress,string data) {
@@ -55,7 +55,21 @@ public class MultiplayerUI : MonoBehaviour {
         lobbys.Add(fromAddress);
         UpdateFoundMatchesText();
         GameObject instantiated = Instantiate (joinButtonPrefab, contentParent);
-		//TODO - funkció hozzáadása a létrehozott gombhoz..
+
+        instantiated.GetComponentInChildren<Button>().onClick.AddListener(new UnityEngine.Events.UnityAction(delegate
+        {
+            //kattintás
+            Dialog.Info("Connecting..", new UnityEngine.Events.UnityAction(delegate
+            {
+                //TODO -- CANCEL
+            }));
+
+
+            StopEverything();
+            GameNetworkManager.singleton.TryToConnect(fromAddress);
+
+
+        }));
 
 		instantiated.GetComponentInChildren<Text> ().text = data;
 	}

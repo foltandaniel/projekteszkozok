@@ -6,13 +6,14 @@ using UnityEngine;
 public class Field : MonoBehaviour {
 
     private int x,y;
-    bool alreadyClicked,amIMine,flagged;
+    public bool alreadyClicked,amIMine,flagged;
 
 
     //refs
     public Renderer front;
 	public Renderer back;
     private Animator anim;
+    public Collider2D myCollider;
     void Start()
     {
         anim = GetComponent<Animator>();
@@ -20,7 +21,29 @@ public class Field : MonoBehaviour {
     }
 
     public TextMesh text;//debug
-	public void Setup(int number,int x,int y,bool mine,Texture texture){
+
+    public int X
+    {
+        get
+        {
+            return x;
+        }
+    }
+
+    public int Y
+    {
+        get
+        {
+            return y;
+        }
+    
+    }
+
+    public bool IsFlagged()
+    {
+        return flagged;
+    }
+    public void Setup(int number,int x,int y,bool mine,Texture texture){
 		text.text = number.ToString();
         this.x = x;
         this.y = y;
@@ -45,45 +68,26 @@ public class Field : MonoBehaviour {
 		}
 	}
 
-	public void ClickedMe(bool logic)
-	/* logic -- az algoritmus fordtotta-e át a fieldet (pl 0 szomszédja..) */
-    {
-        if (alreadyClicked) return;
-		if(flagged) {
-			FlagMe ();
-            /*GameManager.singleton.FlagCount(-1);
-			back.material.color = Color.white;
-			flagged = false;*/
 
-			if (!logic) return; //ha kézzel kattintottunk rá, és flaggelve van, akkor ne forduljon át 
-		}
-        TurnMe();
-        alreadyClicked = true;
-        GameManager.singleton.Clicked(x,y);
-    
-
-
-        
-    }
     public void TurnMe() {
-		if (alreadyClicked) {
-			return;
-		}
+		if (alreadyClicked)	return;
+		
 		anim.Play("Turn");
-
-		if(flagged&&GameManager.PLAYING){
+        Destroy(myCollider);
+		if(flagged){
 			FlagMe ();
 		}
+        alreadyClicked = true;
     }
 
 	private void Unflag(){
-		GameManager.singleton.FlagCount(-1);
+		GlobalGameManager.singleton.actualGameManager.FlagCount(-1);
 		back.material.color = Color.white;
 		flagged = false;
 	}
 
 	private void DoFlag(){
-		GameManager.singleton.FlagCount(+1);
+		GlobalGameManager.singleton.actualGameManager.FlagCount(+1);
 		back.material.color = Color.red;
 		flagged = true;
 	}

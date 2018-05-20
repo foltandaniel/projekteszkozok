@@ -60,9 +60,8 @@ public class CameraControl : MonoBehaviour {
 #if UNITY_ANDROID && !UNITY_EDITOR
     //ANDROID UPDATE
     void Update() {
-		if (!GameManager.PLAYING)
-			return;
-    
+        if (!GlobalGameManager.canMove)
+            return;
         if (Input.touchCount == 0) return;
 
 
@@ -156,7 +155,7 @@ public class CameraControl : MonoBehaviour {
     //WINDOWS UPDATE
     void Update()
     {
-        if (!GameManager.PLAYING)
+        if (!GlobalGameManager.canMove) 
             return;
 
        if(Input.GetMouseButtonUp(0))
@@ -249,7 +248,24 @@ public class CameraControl : MonoBehaviour {
 				if (_long) {
 					hit.collider.gameObject.GetComponent<Field> ().FlagMe ();
 				} else {
-					hit.collider.gameObject.GetComponent<Field> ().ClickedMe (false);
+
+                    // hit.collider.gameObject.GetComponent<Field>().ClickedMe(false);
+                    /* Előbb a GameManagernek szólunk, majd ő elintézi a többit */
+
+                    Field clickedField = hit.collider.gameObject.GetComponent<Field>();
+
+
+                    if (!GlobalGameManager.singleton.actualGame.multiplayer)
+                    {
+                        GlobalGameManager.singleton.actualGameManager.Clicked(clickedField.X, clickedField.Y);
+                    } else
+                    {
+                        Player.myPlayer.Click(clickedField.X, clickedField.Y);
+                    }
+
+                    /* ha nem multiplayer, egyből a GameManagernek szólunk, hogy tegye a dolgát.
+                    ha multiplayer, ezt NEM tehetjük meg, mert nincs hozzá jogunk. A 
+                    Player Scriptnek kell szólni, és ő majd szól a szervernek*/
 				}
             }
         }
@@ -291,7 +307,7 @@ public class CameraControl : MonoBehaviour {
 
     public void AlignCamera(int n)
     {
-        Console.Log("Align camera: " + n);
+     
         mapSize = n;
         transform.GetChild(0).localScale *= n;
         cam.orthographicSize =n;
