@@ -25,15 +25,13 @@ public class SinglePlayerGameManager : NetworkBehaviour {
 
     protected Coroutine counter; //referencia a számláló funkcióra, hogy megtudjuk állítani
     protected WaitForSeconds floodWait = new WaitForSeconds(0.17f);
-    protected GameObject fieldPrefab;
-
+   
 
 
     public virtual void Start()
     {
         GlobalGameManager.singleton.actualGameManager = this;
         actualGame = GlobalGameManager.singleton.actualGame;
-        fieldPrefab = GlobalGameManager.singleton.fieldPrefab;
         timeText = References.singleton.timeText;
         pointText = References.singleton.pointOrWhoText;      
         flaggedCount = 0;
@@ -169,7 +167,10 @@ public class SinglePlayerGameManager : NetworkBehaviour {
         {
             for (int j = 0; j < actualGame.n; j++)
             {
-                GameObject go = Instantiate(fieldPrefab, new Vector3(i + 0.5f, j + 0.5f, 0), Quaternion.identity, parent);
+                if(GlobalGameManager.singleton.fieldPrefab == null) {
+                    Console.LogError("FieldPrefab is null!!!");
+                }
+                GameObject go = Instantiate(GlobalGameManager.singleton.fieldPrefab, new Vector3(i + 0.5f, j + 0.5f, 0), Quaternion.identity, parent);
                 Field currentfield = go.GetComponent<Field>();
 
                 field[i, j].fieldClass = currentfield;
