@@ -58,6 +58,9 @@ public class GlobalGameManager : MonoBehaviour {
     {
         Console.Log("SCENE CHANGE: "+ from.name + "->" + to.name);
 		if (to.name == "SinglePlayerScene") {
+            if (singleplayerManagerPrefab == null) {
+                Console.LogError("singplayerManager is null!!");
+            }
             GameObject.Instantiate(singleplayerManagerPrefab);
 
 		} else if(to.name == "MultiPlayerScene")
